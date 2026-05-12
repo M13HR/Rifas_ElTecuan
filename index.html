@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Gran Sorteo Cuatrimoto Vento Gladiator 200cc </title>
+    <title>Rifas El Tecuan - Vento Gladiator 200cc</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
@@ -19,9 +19,9 @@
         /* HEADER */
         .hero { background: var(--naranja); padding: 25px 15px; text-align: center; color: white; border-bottom: 6px solid var(--azul); position: relative; }
         .logo-img { width: 90px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: white; }
-        .hero h1 { font-size: 18px; margin: 10px 0 0; text-transform: uppercase; text-shadow: 1px 1px 0px var(--azul); color: white; }
+        .hero h1 { font-size: 20px; margin: 10px 0 0; text-transform: uppercase; text-shadow: 1px 1px 0px var(--azul); color: white; }
         
-        /* TICKER DE ÚLTIMOS APARTADOS */
+        /* TICKER ESTILO CUERNAVACA */
         .ticker { background: #fff9e6; border-bottom: 1px solid #ffeeba; padding: 8px; overflow: hidden; white-space: nowrap; font-size: 12px; color: #856404; }
         .ticker-content { display: inline-block; animation: ticker 20s linear infinite; }
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -62,12 +62,13 @@
 <div class="app">
     <div class="hero">
         <img src="Logo Rifas el tecuan.png" class="logo-img">
-        <h1>Sorteo Cuatrimoto Vento 🐯</h1>
+        <h1>Vento Gladiator 200cc 🐯</h1>
     </div>
 
+    <!-- TICKER DINÁMICO -->
     <div class="ticker">
         <div class="ticker-content" id="ticker-text">
-            ¡Mucha suerte a todos los participantes! 🍀 Tómbola en Vivo próximamente... 🐯
+            ¡Mucha suerte a todos los participantes! 🍀 El Tecuan te premia... 🐯
         </div>
     </div>
 
@@ -77,6 +78,7 @@
         <div class="tab" id="tab-info" onclick="switchTab('info')">📢 INFO</div>
     </div>
 
+    <!-- SECCIÓN BOLETOS -->
     <div id="sec-boletos" class="section active">
         <div class="card" style="text-align: center;">
             <img src="Para rifas 17 Pro Max.jpeg" class="moto-img">
@@ -94,6 +96,7 @@
         <div id="grid" class="grid"></div>
     </div>
 
+    <!-- SECCIÓN VERIFICADOR -->
     <div id="sec-verificar" class="section">
         <div class="card" style="text-align: center;">
             <h3 style="color: var(--azul);">Consulta tu boleto</h3>
@@ -103,33 +106,43 @@
         </div>
     </div>
 
+    <!-- SECCIÓN INFO (RECUPERADA) -->
     <div id="sec-info" class="section">
         <div class="card">
-            <h4 style="color: var(--azul); margin:0;">Tómbola en Vivo 🎰</h4>
-            <p style="font-size: 14px;">Transparencia total el 17 de Septiembre por Instagram.</p>
-            <a href="https://instagram.com/rifas_el_tecuan" target="_blank" style="color: var(--naranja); font-weight: bold; text-decoration: none;">@RIFAS_EL_TECUAN</a>
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px; margin-top: 0;">📍 Sede del Sorteo</h3>
+            <p>Acatlán de Osorio, Puebla.</p>
+            
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">📅 Fecha Confirmada</h3>
+            <p>17 de Septiembre 2026</p>
+            
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">🎰 Método Transparente</h3>
+            <p>El sorteo se realizará mediante <b>Tómbola en Vivo</b> por nuestra cuenta de Instagram. ¡Resultados directos y reales!</p>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <a href="https://instagram.com/rifas_el_tecuan" target="_blank" style="color: var(--naranja); font-weight: bold; text-decoration: none; display: block; text-align: center;">📸 SÍGUENOS: @RIFAS_EL_TECUAN</a>
         </div>
     </div>
 
     <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR BOLETOS 🍀</button>
 
+    <!-- FORMULARIO DE APARTADO -->
     <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none; overflow-y: auto;">
          <div style="padding:30px 20px; text-align: center;">
             <h2>🐯 ¡YA CASI!</h2>
-            <p>Números: <b id="nums-confirmar" style="color: var(--naranja);"></b></p>
+            <p>Boletos: <b id="nums-confirmar" style="color: var(--naranja);"></b></p>
             <input type="text" id="nombre" class="v-input" placeholder="Nombre completo">
-            <input type="number" id="whatsapp" class="v-input" placeholder="WhatsApp">
+            <input type="number" id="whatsapp" class="v-input" placeholder="WhatsApp (10 dígitos)">
             <select id="estado" class="v-input">
-                <option value="" disabled selected>Estado</option>
+                <option value="" disabled selected>Selecciona tu Estado</option>
                 <option value="Puebla">Puebla</option>
                 <option value="Oaxaca">Oaxaca</option>
                 <option value="CDMX">CDMX</option>
                 <option value="Veracruz">Veracruz</option>
                 <option value="Otro">Otro</option>
             </select>
-            <input type="text" id="municipio" class="v-input" placeholder="Municipio">
+            <input type="text" id="municipio" class="v-input" placeholder="Municipio o Localidad">
             <button class="btn-v" style="background: var(--verde);" onclick="enviar()">CONFIRMAR APARTADO</button>
-            <p onclick="cerrarForm()" style="color:gray; margin-top:20px; text-decoration:underline;">Regresar</p>
+            <p onclick="cerrarForm()" style="color:gray; margin-top:20px; text-decoration:underline; cursor:pointer;">Regresar</p>
          </div>
     </div>
 </div>
@@ -159,10 +172,10 @@
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
             
+            // Lógica inteligente para bloquear números (Soluciona caso boleto 178)
             const bloquear = (lista, clase) => {
                 if(!lista) return;
                 lista.forEach(nRaw => {
-                    // Limpia espacios y rellena con ceros hasta 4 dígitos
                     let nFormateado = nRaw.toString().trim().padStart(4, '0');
                     let el = document.getElementById("n-" + nFormateado);
                     if(el) el.className = 'num ' + clase;
@@ -176,9 +189,9 @@
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
             
             if(data.apartados && data.apartados.length > 0) {
-                document.getElementById('ticker-text').innerText = "🔥 Últimos apartados: " + data.apartados.slice(-5).join(', ') + " ... ¡Mucha suerte! 🐯";
+                document.getElementById('ticker-text').innerText = "🔥 ¡Últimos números apartados! " + data.apartados.slice(-5).join(', ') + " ... ¡Suerte a todos! 🐯";
             }
-        } catch (e) { console.error("Error cargando", e); }
+        } catch (e) { console.error("Error al cargar datos", e); }
     }
 
     function togg(n, el) {
@@ -231,7 +244,7 @@
         const w = document.getElementById('whatsapp').value;
         const est = document.getElementById('estado').value;
         const mun = document.getElementById('municipio').value;
-        if(!n || !w || !est || !mun) return alert("Llena todos los campos");
+        if(!n || !w || !est || !mun) return alert("Por favor, llena todos los campos");
         
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre: n, whatsapp: w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) });
