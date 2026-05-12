@@ -143,7 +143,6 @@
         document.getElementById('tab-' + tab).classList.add('active');
         document.getElementById('sec-' + tab).classList.add('active');
     }
-
    async function cargar() {
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
@@ -168,7 +167,6 @@
                 if(el) el.className = 'num ' + clase;
             });
         };
-
         bloquear(data.apartados || [], 'apartado');
         bloquear(data.pagados || [], 'pagado');
         
