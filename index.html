@@ -3,70 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Vento Gladiator 2.0</title>
+    <title>Rifas El Tecuan - Vento Gladiator</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --primary: #25d366; --gold: #ffd700; --bg: #0a0a0a; --card: #161616; }
-        body { font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; padding-bottom: 120px; display: flex; justify-content: center; }
-        .app { width: 100%; max-width: 500px; background: var(--card); border-radius: 30px; border: 1px solid #333; overflow: hidden; text-align: center; }
+        body { font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; margin: 0; padding: 5px; padding-bottom: 100px; }
+        .app { width: 100%; max-width: 450px; background: var(--card); border-radius: 25px; border: 1px solid #333; margin: auto; overflow: hidden; text-align: center; }
         
-        /* HEADER */
-        .hero { background: linear-gradient(180deg, #1b4d2b 0%, #0a0a0a 100%); padding: 25px 20px; border-bottom: 4px solid var(--primary); }
-        .logo-img { width: 100px; margin-bottom: 12px; filter: drop-shadow(0 0 5px var(--primary)); }
-        .hero h1 { color: var(--gold); font-size: 20px; margin: 0; text-transform: uppercase; }
-        .date-badge { background: #e74c3c; color: white; font-size: 12px; padding: 6px 15px; border-radius: 50px; margin-top: 10px; display: inline-block; font-weight: bold; }
-        .price-badge { background: white; color: black; display: block; width: fit-content; margin: 10px auto; padding: 5px 20px; border-radius: 50px; font-size: 18px; }
+        .hero { background: linear-gradient(180deg, #1b4d2b 0%, #0a0a0a 100%); padding: 20px; border-bottom: 3px solid var(--primary); }
+        .logo-img { width: 80px; margin-bottom: 10px; }
+        .hero h1 { color: var(--gold); font-size: 18px; margin: 0; }
+        .date-badge { background: #e74c3c; color: white; font-size: 11px; padding: 5px 12px; border-radius: 50px; margin-top: 8px; display: inline-block; }
 
-        /* BUSCADOR */
-        .search-area { background: #222; margin: 15px; padding: 20px; border-radius: 20px; border: 1px solid #333; }
-        .input-group { display: flex; gap: 10px; }
-        .input-group input { flex: 1; padding: 16px; border-radius: 12px; border: 2px solid #444; background: #000; color: white; font-size: 20px; text-align: center; outline: none; }
-        #scan-msg { font-size: 12px; color: var(--primary); font-family: monospace; height: 15px; margin-bottom: 5px; opacity: 0; }
-        .btn-buscar { background: var(--gold); border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        /* FOTO OPTIMIZADA */
+        .promo-img { 
+            width: 85%; 
+            max-height: 200px; /* Evita que se vea gigante */
+            object-fit: contain; 
+            border-radius: 15px; 
+            margin: 10px auto; 
+            display: block; 
+            border: 1px solid #333;
+        }
 
-        /* COMBOS RÁPIDOS (SIN PROMO) */
-        .combos-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 15px 15px 15px; }
-        .combo-card { background: #111; padding: 12px 5px; border-radius: 12px; border: 1px solid #444; cursor: pointer; }
-        .combo-card b { display: block; color: var(--primary); font-size: 15px; }
+        .price-badge { background: white; color: black; padding: 5px 15px; border-radius: 50px; font-size: 16px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
 
-        /* CARRITO */
-        #carrito-lucky { display: none; background: #000; margin: 15px; padding: 15px; border-radius: 15px; border: 1px solid var(--primary); }
-        .lucky-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
-        .tag { background: var(--primary); color: black; padding: 6px 12px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        .tag span { cursor: pointer; background: rgba(0,0,0,0.2); border-radius: 50%; width: 18px; height: 18px; line-height: 18px; text-align: center; }
+        .search-area { background: #222; margin: 10px; padding: 15px; border-radius: 15px; }
+        .input-group { display: flex; gap: 8px; }
+        .input-group input { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #444; background: #000; color: white; font-size: 18px; text-align: center; }
+        #scan-msg { font-size: 11px; color: var(--primary); font-family: monospace; height: 14px; margin-bottom: 4px; opacity: 0; }
+        .btn-buscar { background: var(--gold); border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* CUADRÍCULA */
-        .grid-info { font-size: 11px; color: #777; margin-bottom: 8px; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; height: 350px; overflow-y: auto; background: #000; padding: 15px; border-radius: 15px; margin: 0 15px 15px 15px; border: 1px solid #222; }
-        .num { padding: 12px 0; background: #2a2a2a; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; color: #ccc; }
+        .combos-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px; }
+        .combo-card { background: #111; padding: 10px 2px; border-radius: 10px; border: 1px solid #444; cursor: pointer; font-size: 11px; }
+        .combo-card b { display: block; color: var(--primary); font-size: 14px; }
+
+        #carrito-lucky { display: none; background: #000; margin: 10px; padding: 12px; border-radius: 12px; border: 1px solid var(--primary); }
+        .lucky-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 8px; }
+        .tag { background: var(--primary); color: black; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+
+        /* CUADRÍCULA OPTIMIZADA */
+        .grid-header { font-size: 10px; color: #666; margin-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; height: 300px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; margin: 10px; border: 1px solid #222; }
+        .num { padding: 10px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: #aaa; }
         .num.selected { background: var(--primary) !important; color: black !important; }
-        .num.apartado { background: #444; color: #777; cursor: not-allowed; opacity: 0.5; }
-        .num.pagado { background: #e74c3c; color: white; cursor: not-allowed; opacity: 0.3; }
+        .num.apartado { background: #333; color: #555; cursor: not-allowed; }
+        .num.pagado { background: #c0392b; color: white; opacity: 0.5; }
         
-        /* BOTÓN FLOTANTE */
-        .btn-flotante { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: var(--primary); color: black; border: none; padding: 18px 45px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 8px 25px rgba(0,255,0,0.4); z-index: 1000; display: none; width: 85%; }
+        .btn-flotante { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: black; border: none; padding: 15px; border-radius: 40px; font-size: 15px; font-weight: bold; width: 80%; box-shadow: 0 5px 20px rgba(0,255,0,0.3); z-index: 1000; display: none; }
 
-        /* FORMULARIO */
-        #seccion-datos { display: none; padding: 25px; background: #1a1a1a; border-radius: 20px; margin: 15px; border: 1px solid #333; text-align: left; }
-        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 16px; }
-        .btn-enviar { background: var(--primary); color: black; border: none; padding: 20px; width: 100%; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        #seccion-datos { display: none; padding: 20px; background: #1a1a1a; border-radius: 20px; margin: 10px; border: 1px solid #333; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; font-size: 15px; box-sizing: border-box; }
+        .btn-enviar { background: var(--primary); color: black; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="hero">
             <img src="Logo Rifas el tecuan.png" class="logo-img">
-            <h1>VENTO GLADIATOR 2.0 200</h1>
-            <div class="date-badge">📅 17 DE SEPTIEMBRE 2026</div>
-            <div class="price-badge"><b>$50</b> POR BOLETO</div>
+            <h1>VENTO GLADIATOR 2.0</h1>
+            <div class="date-badge">📅 17 SEPTIEMBRE 2026</div>
         </div>
 
-        <img src="Para rifas 17 Pro Max.jpeg" class="promo-img" alt="Vento Gladiator">
+        <img src="Para rifas 17 Pro Max.jpeg" class="promo-img">
+        <div class="price-badge">$50 x BOLETO</div>
 
         <div class="search-area">
             <div id="scan-msg"></div>
             <div class="input-group">
-                <input type="number" id="input-busqueda" placeholder="Busca del 0001 al 2500" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+                <input type="number" id="input-busqueda" placeholder="Busca tu número">
                 <button class="btn-buscar" onclick="buscarNumero()">BUSCAR</button>
             </div>
         </div>
@@ -78,34 +83,31 @@
         </div>
 
         <div id="carrito-lucky">
-            <div style="font-size: 12px; color: var(--gold);">🎟️ BOLETOS ELEGIDOS</div>
+            <div style="font-size: 11px; color: var(--gold);">LISTO PARA APARTAR:</div>
             <div id="tags-contenedor" class="lucky-tags"></div>
         </div>
 
-        <div class="grid-info">Selecciona tus números favoritos:</div>
-        <div id="grid" class="grid">Cargando 2,500 números...</div>
+        <div class="grid-header">Mostrando sugerencias (0001 - 0500)</div>
+        <div id="grid" class="grid">Cargando...</div>
 
-        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE 🍀</button>
+        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR NÚMEROS 🍀</button>
 
         <div id="seccion-datos">
-            <h2 style="color: var(--gold); font-size: 18px; text-align: center;">📝 REGISTRO DE APARTADO</h2>
+            <h2 style="color: var(--gold); font-size: 16px;">REGISTRO</h2>
             <input type="text" id="nombre" placeholder="Nombre completo">
             <input type="number" id="whatsapp" placeholder="WhatsApp (10 dígitos)">
             <select id="estado">
-                <option value="" disabled selected>Tu Estado</option>
+                <option value="" disabled selected>Estado</option>
                 <option value="Puebla">Puebla</option><option value="Oaxaca">Oaxaca</option>
                 <option value="CDMX">CDMX</option><option value="Veracruz">Veracruz</option>
-                <option value="Morelos">Morelos</option><option value="Guerrero">Guerrero</option>
             </select>
             <input type="text" id="municipio" placeholder="Municipio">
-            <button id="btn-final" class="btn-enviar" onclick="enviar()">CONFIRMAR Y ENVIAR 🐯</button>
+            <button id="btn-final" class="btn-enviar" onclick="enviar()">CONFIRMAR 🐯</button>
         </div>
     </div>
 
     <script>
-        // TU URL DE GOOGLE SHEETS VINCULADA
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec"; 
-        
         let seleccionados = [];
         let apartadosRemotos = [];
         let pagadosRemotos = [];
@@ -119,42 +121,46 @@
 
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
-                for(let i=1; i <= 2500; i++) {
+                // CARGA SOLO 500 PARA QUE NO SE TRABE
+                for(let i=1; i <= 500; i++) {
                     let n = i.toString().padStart(4, '0');
-                    let div = document.createElement('div');
-                    div.innerText = n; div.id = "n-"+n;
-                    if (pagadosRemotos.includes(n)) div.className = 'num pagado';
-                    else if (apartadosRemotos.includes(n)) div.className = 'num apartado';
-                    else { 
-                        div.className = 'num'; 
-                        div.onclick = () => togg(n, div); 
-                    }
-                    grid.appendChild(div);
+                    crearBoleto(n, grid);
                 }
-            } catch (e) { document.getElementById('grid').innerText = "Conexión lista."; }
+            } catch (e) { document.getElementById('grid').innerText = "Lista lista."; }
+        }
+
+        function crearBoleto(n, contenedor) {
+            let div = document.createElement('div');
+            div.innerText = n; div.id = "n-"+n;
+            if (pagadosRemotos.includes(n)) div.className = 'num pagado';
+            else if (apartadosRemotos.includes(n)) div.className = 'num apartado';
+            else { 
+                div.className = 'num'; 
+                div.onclick = () => togg(n, div); 
+                if(seleccionados.includes(n)) div.classList.add('selected');
+            }
+            contenedor.appendChild(div);
         }
 
         async function buscarNumero() {
             let n = document.getElementById('input-busqueda').value.padStart(4, '0');
             const scanMsg = document.getElementById('scan-msg');
-            const numVal = parseInt(n);
-            
-            if(numVal < 1 || numVal > 2500 || isNaN(numVal)) return alert("Número fuera de rango (0001-2500)");
+            if(parseInt(n) < 1 || parseInt(n) > 2500) return alert("Rango: 0001-2500");
 
             scanMsg.style.opacity = "1";
-            const frases = ["Buscando...", "Verificando disponibilidad...", "¡Localizado!"];
-            for(let f of frases) { scanMsg.innerText = ">> " + f; await new Promise(r => setTimeout(r, 350)); }
+            scanMsg.innerText = ">> Verificando...";
+            await new Promise(r => setTimeout(r, 600));
 
             if(pagadosRemotos.includes(n) || apartadosRemotos.includes(n)) {
-                scanMsg.innerText = ">> EL NÚMERO YA ESTÁ OCUPADO ❌";
+                scanMsg.innerText = ">> NO DISPONIBLE ❌";
                 return;
             }
 
             if(!seleccionados.includes(n)) {
                 seleccionados.push(n);
                 let el = document.getElementById("n-"+n);
-                if(el) { el.classList.add('selected'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
-                confetti({ particleCount: 50, spread: 40 });
+                if(el) el.classList.add('selected');
+                confetti({ particleCount: 40, spread: 30 });
             }
             scanMsg.style.opacity = "0";
             actualizar();
@@ -173,9 +179,7 @@
                 }
                 bucle++;
             }
-            confetti({ particleCount: 100, spread: 70 });
             actualizar();
-            document.getElementById('carrito-lucky').scrollIntoView({ behavior: 'smooth' });
         }
 
         function togg(n, el) {
@@ -194,7 +198,6 @@
             const contenedor = document.getElementById('tags-contenedor');
             const btnFlotante = document.getElementById('btn-flotante');
             contenedor.innerHTML = '';
-            
             if(seleccionados.length > 0) {
                 carrito.style.display = 'block';
                 btnFlotante.style.display = (document.getElementById('seccion-datos').style.display === 'block') ? 'none' : 'block';
@@ -224,18 +227,12 @@
             const w = document.getElementById('whatsapp').value;
             const est = document.getElementById('estado').value;
             const mun = document.getElementById('municipio').value;
-
-            if(!n || !w || !est || !mun) return alert("Por favor, completa todos los campos.");
+            if(!n || !w) return alert("Faltan datos.");
             
             const btn = document.getElementById('btn-final');
-            btn.innerText = "🐯 REGISTRANDO..."; btn.disabled = true;
+            btn.innerText = "REGISTRANDO..."; btn.disabled = true;
 
-            // REGISTRO EN GOOGLE SHEETS
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) 
-            });
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) });
 
             let total = seleccionados.length * 50;
             const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n` +
@@ -243,12 +240,9 @@
                         `👤 *CLIENTE:* ${n}\n` +
                         `🔢 *BOLETOS:* ${seleccionados.join(', ')}\n` +
                         `💰 *TOTAL:* $${total} MXN\n` +
-                        `📅 *FECHA:* 17 Septiembre 2026\n\n` +
-                        `*Tengo 6 horas para realizar mi pago.* 🍀`;
+                        `*Pago en 6 horas.*`;
             
-            setTimeout(() => {
-                window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-            }, 1000);
+            setTimeout(() => { window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`; }, 800);
         }
 
         cargar();
