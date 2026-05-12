@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Gran Sorteo</title>
+    <title>Rifas El Tecuan - Gran Sorteo Cuatrimoto</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
@@ -14,17 +14,17 @@
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: #333; margin: 0; padding-bottom: 100px; }
-        .app { width: 100%; max-width: 480px; background: white; margin: auto; min-height: 100vh; position: relative; }
+        .app { width: 100%; max-width: 480px; background: white; margin: auto; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
         
         /* HEADER ESTILO PREMIUM */
         .hero { background: var(--naranja); padding: 25px 15px; text-align: center; color: white; border-bottom: 6px solid var(--azul); position: relative; overflow: hidden; }
         .hero::after { content: '🍀'; position: absolute; bottom: -10px; right: -10px; font-size: 80px; opacity: 0.1; }
-        .logo-img { width: 100px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .hero h1 { font-size: 22px; margin: 15px 0 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--azul); }
+        .logo-img { width: 100px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: white; }
+        .hero h1 { font-size: 20px; margin: 15px 0 0; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px var(--azul); color: white; }
         
         /* NAVEGACIÓN ESTILO APP */
-        .nav-tabs { display: flex; background: var(--azul); sticky: top; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .tab { flex: 1; padding: 16px 5px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .nav-tabs { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .tab { flex: 1; padding: 16px 5px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-weight: bold; transition: 0.3s; }
         .tab.active { color: white; background: rgba(255,255,255,0.1); border-bottom: 4px solid var(--naranja); }
 
         .section { display: none; padding: 20px 15px; animation: slideUp 0.4s ease-out; }
@@ -33,7 +33,7 @@
 
         /* BARRA DE PROGRESO */
         .progress-container { background: #eee; border-radius: 20px; height: 12px; margin: 15px 0; overflow: hidden; border: 1px solid #ddd; }
-        .progress-bar { background: linear-gradient(90deg, var(--verde), #8df388); width: 45%; height: 100%; border-radius: 20px; }
+        .progress-bar { background: linear-gradient(90deg, var(--verde), #8df388); width: 0%; height: 100%; border-radius: 20px; transition: width 1s ease-in-out; }
 
         /* BOLETOS */
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; height: 480px; overflow-y: auto; background: #fafafa; padding: 15px; border-radius: 15px; border: 1px solid #ddd; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); }
@@ -47,20 +47,22 @@
             color: var(--azul); 
             transition: 0.2s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
         }
         .num:active { transform: scale(0.9); }
         .num.selected { background: var(--verde) !important; color: white !important; border-color: var(--azul); transform: scale(1.05); }
-        .num.apartado { background: #f0f0f0; color: #ccc; cursor: not-allowed; border: 1px dashed #ccc; }
+        .num.apartado { background: #f0f0f0; color: #ccc; cursor: not-allowed; border: 1px dashed #ccc; text-decoration: line-through; }
         .num.pagado { background: #ff4d4d; color: white; cursor: not-allowed; opacity: 0.6; }
 
         /* CARDS */
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #eee; margin-bottom: 20px; }
         .price-tag { background: var(--azul); color: white; padding: 8px 20px; border-radius: 50px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 
+        .btn-v { background: var(--azul); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
         .btn-flotante { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; border: none; padding: 18px 30px; border-radius: 50px; font-size: 18px; font-weight: bold; width: 85%; box-shadow: 0 10px 25px rgba(77, 183, 72, 0.4); z-index: 1000; display: none; border: 2px solid white; }
 
-        /* VERIFICADOR */
-        .v-input { width: 100%; padding: 18px; border-radius: 12px; border: 2px solid #ddd; margin-bottom: 15px; font-size: 18px; box-sizing: border-box; outline: none; }
+        /* INPUTS */
+        .v-input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid #ddd; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; outline: none; transition: border-color 0.3s; }
         .v-input:focus { border-color: var(--azul); }
     </style>
 </head>
@@ -74,85 +76,98 @@
     </div>
 
     <div class="nav-tabs">
-        <div class="tab active" onclick="switchTab('boletos')">🎟️ BOLETOS</div>
-        <div class="tab" onclick="switchTab('verificar')">🔍 VERIFICAR</div>
-        <div class="tab" onclick="switchTab('info')">📢 EVENTO</div>
+        <div class="tab active" id="tab-boletos" onclick="switchTab('boletos')">🎟️ BOLETOS</div>
+        <div class="tab" id="tab-verificar" onclick="switchTab('verificar')">🔍 VERIFICAR</div>
+        <div class="tab" id="tab-info" onclick="switchTab('info')">📢 EVENTO</div>
     </div>
 
     <div id="sec-boletos" class="section active">
         <div class="card" style="text-align: center;">
             <div class="price-tag">$50.00 MXN</div>
-            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">¡Busca tu número de la suerte!</div>
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
-            <div style="font-size: 10px; display: flex; justify-content: space-between; color: #999;">
-                <span>Boletos vendidos</span>
+            <div style="font-size: 11px; display: flex; justify-content: space-between; color: #999;">
+                <span>Boletos apartados</span>
                 <span>Meta: 2,500</span>
             </div>
         </div>
         
         <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-            <input type="number" id="busc" placeholder="Ej: 0717" style="flex:1; padding:15px; border-radius:10px; border:1px solid #ddd;">
-            <button onclick="buscarNumero()" style="background: var(--naranja); color:white; border:none; padding:0 20px; border-radius:10px; font-weight:bold;">BUSCAR</button>
+            <input type="number" id="busc" placeholder="Busca tu número (Ej: 0717)" class="v-input" style="margin-bottom:0; flex:1;">
+            <button onclick="buscarNumero()" style="background: var(--naranja); color:white; border:none; padding:0 20px; border-radius:10px; font-weight:bold; cursor:pointer;">IR</button>
         </div>
 
-        <div id="grid" class="grid">Cargando...</div>
+        <div id="grid" class="grid">Cargando números...</div>
     </div>
 
     <div id="sec-verificar" class="section">
         <div class="card" style="text-align: center;">
             <h2 style="color: var(--azul); margin-top: 0;">Mis Números</h2>
-            <p style="color: #666; font-size: 14px;">Ingresa el WhatsApp con el que apartaste</p>
-            <input type="number" id="v-ws" class="v-input" placeholder="953 123 4567">
-            <button class="btn-flotante" style="display:block; position:static; transform:none; width:100%; margin-top:10px;" onclick="verificarBoletos()">CONSULTAR TÓMBOLA</button>
-            <div id="res-v" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
+            <p style="color: #666; font-size: 14px;">Consulta tus boletos físicos o digitales</p>
+            <input type="number" id="v-ws" class="v-input" placeholder="Tu WhatsApp (10 dígitos)">
+            <button class="btn-v" onclick="verificarBoletos()">CONSULTAR TÓMBOLA</button>
+            <div id="res-v" style="margin-top:20px; padding:15px; border-radius:10px; display:none; border: 1px solid #ddd;"></div>
         </div>
     </div>
 
     <div id="sec-info" class="section">
         <div class="card">
-            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">📍 Ubicación</h3>
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">📍 Sede del Sorteo</h3>
             <p>Acatlán de Osorio, Puebla.</p>
             
-            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">📅 Fecha y Hora</h3>
-            <p>17 de Septiembre 2026 - Transmisión en vivo.</p>
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">📅 Fecha Confirmada</h3>
+            <p>17 de Septiembre 2026</p>
 
-            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">🎥 Transmisión</h3>
-            <p>Se llevará a cabo mediante una <b>Tómbola en Vivo</b> por Instagram:</p>
-            <a href="https://instagram.com/rifas_el_tecuan" style="color: var(--naranja); font-weight: bold; text-decoration: none;">@RIFAS_EL_TECUAN 📸</a>
+            <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">🎰 Método Transparente</h3>
+            <p>El sorteo se realizará mediante <b>Tómbola en Vivo</b> a través de nuestro Instagram oficial. ¡Mucha suerte!</p>
+            <a href="https://instagram.com/rifas_el_tecuan" target="_blank" style="color: var(--naranja); font-weight: bold; text-decoration: none; display: block; margin-top: 10px;">📸 @RIFAS_EL_TECUAN</a>
         </div>
     </div>
 
     <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE 🍀</button>
 
-    <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none;">
+    <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none; overflow-y: auto;">
          <div style="padding:40px 20px; text-align: center;">
             <div style="font-size: 50px;">🐯</div>
-            <h2 style="color:var(--azul)">¡CASI ES TUYO!</h2>
-            <p>Boletos seleccionados: <br><b id="nums-confirmar" style="color: var(--naranja); font-size: 20px;"></b></p>
+            <h2 style="color:var(--azul); margin-bottom:5px;">¡CASI TERMINAMOS!</h2>
+            <p style="font-size:14px; color:#666;">Completa tus datos para el registro:<br><b id="nums-confirmar" style="color: var(--naranja); font-size: 18px;"></b></p>
+            
             <input type="text" id="nombre" class="v-input" placeholder="Nombre completo">
-            <input type="number" id="whatsapp" class="v-input" placeholder="WhatsApp a 10 dígitos">
-            <button class="btn-flotante" style="display:block; position:static; transform:none; width:100%;" onclick="enviar()">ENVIAR POR WHATSAPP</button>
-            <button onclick="cerrarForm()" style="background:none; border:none; color:gray; margin-top:25px; text-decoration:underline;">Volver a la lista</button>
+            <input type="number" id="whatsapp" class="v-input" placeholder="WhatsApp (10 dígitos)">
+            
+            <select id="estado" class="v-input" style="background: white;">
+                <option value="" disabled selected>Selecciona tu Estado</option>
+                <option value="Puebla">Puebla</option>
+                <option value="Oaxaca">Oaxaca</option>
+                <option value="CDMX">CDMX</option>
+                <option value="Veracruz">Veracruz</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <input type="text" id="municipio" class="v-input" placeholder="Municipio / Localidad">
+
+            <button class="btn-v" style="background: var(--verde); padding: 18px;" onclick="enviar()">RESERVAR Y ENVIAR 🍀</button>
+            <button onclick="cerrarForm()" style="background:none; border:none; color:gray; margin-top:25px; text-decoration:underline; cursor:pointer;">Regresar a la lista</button>
          </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec";
+    const SCRIPT_URL = "AQUI_PEGA_TU_NUEVO_URL_DE_IMPLEMENTACION"; //
     let seleccionados = [];
 
     function switchTab(tab) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
         document.getElementById('sec-' + tab).classList.add('active');
+        window.scrollTo(0,0);
     }
 
     async function cargar() {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
+        // Crear 2,500 boletos
         for(let i=1; i <= 2500; i++) {
             let n = i.toString().padStart(4, '0');
             let div = document.createElement('div');
@@ -163,14 +178,18 @@
         try {
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
-            (data.apartados || []).forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num apartado'; });
-            (data.pagados || []).forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num pagado'; });
             
-            // Actualizar barra de progreso con datos reales
-            const totalOcupados = (data.apartados?.length || 0) + (data.pagados?.length || 0);
+            const apartados = data.apartados || [];
+            const pagados = data.pagados || [];
+
+            apartados.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num apartado'; });
+            pagados.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num pagado'; });
+            
+            // Actualizar barra de progreso
+            const totalOcupados = apartados.length + pagados.length;
             const porcentaje = (totalOcupados / 2500) * 100;
             document.querySelector('.progress-bar').style.width = porcentaje + '%';
-        } catch (e) { console.log("Error al cargar datos"); }
+        } catch (e) { console.log("Iniciando sistema..."); }
     }
 
     function togg(n, el) {
@@ -182,7 +201,9 @@
             seleccionados.push(n); 
             el.classList.add('selected'); 
         }
-        document.getElementById('btn-flotante').style.display = seleccionados.length > 0 ? 'block' : 'none';
+        const btn = document.getElementById('btn-flotante');
+        btn.style.display = seleccionados.length > 0 ? 'block' : 'none';
+        document.getElementById('btn-flotante').innerHTML = `APARTAR ${seleccionados.length} BOLETO(S) 🍀`;
     }
 
     function irAlFormulario() {
@@ -195,30 +216,70 @@
     async function verificarBoletos() {
         const ws = document.getElementById('v-ws').value;
         const res = document.getElementById('res-v');
-        if(ws.length < 10) return alert("Ingresa tu número");
-        res.style.display = "block"; res.innerText = "Buscando en la tómbola...";
+        if(ws.length < 10) return alert("Ingresa tu número de WhatsApp");
+        
+        res.style.display = "block";
+        res.style.background = "#f8f9fa";
+        res.innerHTML = "🔍 Buscando en la base de datos...";
+
         try {
-            const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
-            const data = await r.json();
+            const response = await fetch(`${SCRIPT_URL}?verificar=${ws}`);
+            const data = await response.json();
+
             if(data.encontrados && data.encontrados.length > 0) {
-                res.innerHTML = `✅ <b>${data.nombre}</b>, tus números:<br><span style="font-size:24px; color:var(--azul)">${data.encontrados.join(', ')}</span>`;
-            } else { res.innerText = "❌ No se encontraron números."; }
-        } catch (e) { res.innerText = "Error de conexión."; }
+                res.style.background = "#dff0d8";
+                res.innerHTML = `✅ <b>${data.nombre}</b>, tus números son:<br>
+                <div style="font-size:24px; color:var(--azul); margin-top:10px; letter-spacing:2px;">${data.encontrados.join(' - ')}</div>
+                <p style="font-size:11px; color:#666; margin-top:10px;">📍 Registrado desde: ${data.municipio}, ${data.estado}</p>`;
+            } else {
+                res.style.background = "#f2dede";
+                res.innerHTML = "❌ No se encontraron boletos con este número.";
+            }
+        } catch (e) { res.innerHTML = "⚠️ Error al conectar. Intenta de nuevo."; }
     }
 
     function buscarNumero() {
-        let n = document.getElementById('busc').value.padStart(4, '0');
+        let val = document.getElementById('busc').value;
+        if(!val) return;
+        let n = val.padStart(4, '0');
         let el = document.getElementById("n-"+n);
-        if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); }
+        if(el) { 
+            el.scrollIntoView({behavior:'smooth', block:'center'}); 
+            // Destello visual para encontrarlo fácil
+            el.style.boxShadow = "0 0 15px var(--naranja)";
+            setTimeout(() => { el.style.boxShadow = "0 2px 4px rgba(0,0,0,0.05)"; }, 2000);
+        } else { alert("Número fuera de rango (0001-2500)"); }
     }
 
     async function enviar() {
         const n = document.getElementById('nombre').value;
         const w = document.getElementById('whatsapp').value;
-        if(!n || !w) return alert("Faltan datos");
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', ') }) });
-        const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n*NUEVO APARTADO WEB*\n*BOLETOS:* ${seleccionados.join(', ')}\n*NOMBRE:* ${n}`;
-        window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+        const est = document.getElementById('estado').value;
+        const mun = document.getElementById('municipio').value;
+
+        if(!n || !w || !est || !mun) return alert("Por favor, completa todos los campos.");
+        
+        // Efecto confeti al apartar
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+        // Enviar al Sheets
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ 
+                nombre: n, 
+                whatsapp: w, 
+                boletos: seleccionados.join(', '),
+                estadoRep: est,
+                municipio: mun
+            }) 
+        });
+
+        const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n*NUEVO APARTADO WEB*\n*NOMBRE:* ${n}\n*ESTADO:* ${est}\n*LOCALIDAD:* ${mun}\n*BOLETOS:* ${seleccionados.join(', ')}\n*TOTAL:* $${seleccionados.length * 50}`;
+        
+        setTimeout(() => {
+            window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+        }, 1000);
     }
 
     cargar();
