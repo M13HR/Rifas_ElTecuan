@@ -3,192 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Vento Gladiator</title>
+    <title>Rifas El Tecuan - Gran Sorteo Cuatrimoto</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #25d366; --gold: #ffd700; --bg: #0a0a0a; --card: #161616; }
-        body { font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 100px; }
-        .app { width: 100%; max-width: 450px; background: var(--card); margin: auto; min-height: 100vh; position: relative; border-left: 1px solid #333; border-right: 1px solid #333; }
+        /* COLORES BASADOS EN TU BOLETO FÍSICO */
+        :root { 
+            --naranja: #ff8c00; 
+            --azul: #2e3192; 
+            --verde-suerte: #4db748;
+            --bg: #f4f4f4;
+            --texto: #333;
+        }
         
-        .hero { background: linear-gradient(180deg, #1b4d2b 0%, #0a0a0a 100%); padding: 20px; text-align: center; border-bottom: 3px solid var(--primary); }
-        .logo-img { width: 80px; }
+        body { font-family: 'Arial', sans-serif; background: var(--bg); color: var(--texto); margin: 0; padding-bottom: 100px; }
+        .app { width: 100%; max-width: 450px; background: white; margin: auto; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
         
-        /* MENÚ DE NAVEGACIÓN ESTILO APP */
-        .nav-tabs { display: flex; background: #222; border-bottom: 1px solid #444; sticky: top; position: sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 11px; color: #888; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #111; }
+        /* HEADER ESTILO BOLETO */
+        .hero { background: var(--naranja); padding: 15px; text-align: center; color: white; border-bottom: 5px solid var(--azul); }
+        .logo-img { width: 90px; border-radius: 50%; background: white; padding: 5px; }
+        .hero h1 { font-size: 18px; margin: 10px 0 5px; color: var(--azul); background: white; display: inline-block; padding: 2px 10px; border-radius: 5px; }
+        
+        /* NAVEGACIÓN */
+        .nav-tabs { display: flex; background: var(--azul); position: sticky; top: 0; z-index: 100; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 11px; color: white; cursor: pointer; font-weight: bold; opacity: 0.7; }
+        .tab.active { opacity: 1; background: var(--naranja); border-bottom: 3px solid white; }
 
-        /* SECCIONES */
-        .section { display: none; padding: 15px; animation: fadeIn 0.4s; }
+        .section { display: none; padding: 15px; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* BOTONES Y TARJETAS */
-        .promo-img { width: 90%; max-height: 180px; object-fit: contain; border-radius: 15px; margin: 10px auto; display: block; }
-        .price-badge { background: white; color: black; padding: 5px 15px; border-radius: 50px; font-size: 16px; font-weight: bold; margin: 10px auto; display: table; }
+        /* DISEÑO DE LOS NÚMEROS (Inspirado en el trébol del boleto) */
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; height: 450px; overflow-y: auto; background: #fff; padding: 10px; border: 2px solid #ddd; border-radius: 10px; }
+        .num { 
+            padding: 12px 0; 
+            background: white; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: var(--azul); 
+            text-align: center;
+            position: relative;
+        }
+        .num::before { content: '🍀'; position: absolute; font-size: 8px; top: 2px; left: 2px; opacity: 0.3; }
+        .num.selected { background: var(--verde-suerte) !important; color: white !important; border-color: var(--azul); }
+        .num.apartado { background: #eee; color: #bbb; cursor: not-allowed; text-decoration: line-through; }
+        .num.pagado { background: #d9534f; color: white; cursor: not-allowed; }
 
-        /* ESTILO VERIFICADOR */
-        .verificador-ui { background: #111; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; }
-        .verificador-ui h2 { color: var(--gold); font-size: 18px; margin-bottom: 20px; }
-        .v-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #000; color: white; font-size: 18px; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-v { background: var(--primary); color: black; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; }
+        /* INFO BOX */
+        .info-box { background: white; border: 2px dashed var(--naranja); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .ig-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px; }
 
-        /* CUADRÍCULA */
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; height: 500px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; border: 1px solid #222; }
-        .num { padding: 12px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-size: 12px; color: #aaa; text-align: center; }
-        .num.selected { background: var(--primary) !important; color: black !important; }
-        .num.apartado { background: #333; color: #555; cursor: not-allowed; }
-        .num.pagado { background: #c0392b; color: white; opacity: 0.5; }
-        
-        .btn-flotante { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: black; border: none; padding: 15px; border-radius: 40px; font-size: 15px; font-weight: bold; width: 80%; box-shadow: 0 5px 20px rgba(0,255,0,0.3); z-index: 1000; display: none; }
-        
-        #res-v { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
+        .btn-v { background: var(--azul); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-flotante { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--verde-suerte); color: white; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: bold; width: 85%; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; display: none; }
     </style>
 </head>
 <body>
-    <div class="app">
-        <div class="hero">
-            <img src="Logo Rifas el tecuan.png" class="logo-img">
-            <div style="color: var(--gold); font-size: 14px;">RIFAS EL TECUAN 🐯</div>
+
+<div class="app">
+    <div class="hero">
+        <img src="Logo Rifas el tecuan.png" class="logo-img">
+        <br>
+        <h1>GRANDIOSO SORTEO</h1>
+        <div style="font-weight: bold; margin-top: 5px;">CUATRIMOTO VENTO 200</div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" id="tab-boletos" onclick="switchTab('boletos')">🎟️ DIGITALES</div>
+        <div class="tab" id="tab-verificar" onclick="switchTab('verificar')">🔍 VERIFICADOR</div>
+        <div class="tab" id="tab-ayuda" onclick="switchTab('ayuda')">📢 INFO EVENTO</div>
+    </div>
+
+    <div id="sec-boletos" class="section active">
+        <div class="info-box">
+            <span style="color: var(--azul); font-weight: bold;">Costo del boleto: $50.00</span><br>
+            <small>Selecciona tus números para el sorteo</small>
+        </div>
+        
+        <div style="margin-bottom: 15px; display: flex; gap: 5px;">
+            <input type="number" id="busc" placeholder="Buscar número..." style="flex:1; padding:12px; border:2px solid var(--azul); border-radius:8px;">
+            <button onclick="buscarNumero()" style="background: var(--naranja); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">BUSCAR</button>
         </div>
 
-        <div class="nav-tabs">
-            <div class="tab active" id="tab-boletos" onclick="switchTab('boletos')">🎟️ BOLETOS</div>
-            <div class="tab" id="tab-verificar" onclick="switchTab('verificar')">🔍 VERIFICAR</div>
-            <div class="tab" id="tab-ayuda" onclick="switchTab('ayuda')">❓ AYUDA</div>
-        </div>
+        <div id="grid" class="grid">Cargando 2,500 números...</div>
+    </div>
 
-        <div id="sec-boletos" class="section active">
-            <img src="Para rifas 17 Pro Max.jpeg" class="promo-img">
-            <div class="price-badge">$50 x BOLETO</div>
-            
-            <div style="background: #222; padding: 10px; border-radius: 15px; margin-bottom: 15px;">
-                <input type="number" id="busc" placeholder="Busca tu número favorito" style="width:70%; padding:10px; border-radius:8px; border:none; background:#000; color:white;">
-                <button onclick="buscarNumero()" style="width:25%; padding:10px; border-radius:8px; background:var(--gold); border:none; font-weight:bold;">IR</button>
-            </div>
-
-            <div id="grid" class="grid">Cargando 2,500 boletos...</div>
-        </div>
-
-        <div id="sec-verificar" class="section">
-            <div class="verificador-ui">
-                <h2>¿YA APARTASTE?</h2>
-                <p style="font-size: 12px; color: #aaa;">Consulta tus números con tu WhatsApp</p>
-                <input type="number" id="v-ws" class="v-input" placeholder="Ej: 9531024519">
-                <button class="btn-v" onclick="verificarBoletos()">BUSCAR MIS BOLETOS</button>
-                <div id="res-v"></div>
-            </div>
-        </div>
-
-        <div id="sec-ayuda" class="section">
-            <div style="background:#111; padding:20px; border-radius:15px; line-height: 1.6;">
-                <h3 style="color:var(--gold)">¿Cómo participar?</h3>
-                <ol style="font-size: 14px; color: #ccc; padding-left: 20px;">
-                    <li>Elige tus números en la pestaña <b>BOLETOS</b>.</li>
-                    <li>Presiona el botón verde de "APARTAR".</li>
-                    <li>Envía tu captura por WhatsApp.</li>
-                    <li>Tienes 6 horas para realizar tu pago.</li>
-                </ol>
-                <p style="font-size: 12px; border-top: 1px solid #333; padding-top: 10px;">Basado en la Lotería Nacional del 17 de Septiembre 2026.</p>
-            </div>
-        </div>
-
-        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE ($<span id="txt-total">0</span>)</button>
-
-        <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; box-sizing:border-box;">
-             <div style="padding:40px 20px;">
-                <h2 style="color:var(--gold)">REGISTRO FINAL</h2>
-                <input type="text" id="nombre" class="v-input" placeholder="Tu nombre">
-                <input type="number" id="whatsapp" class="v-input" placeholder="Tu WhatsApp">
-                <button class="btn-v" onclick="enviar()">CONFIRMAR Y ENVIAR 🐯</button>
-                <button onclick="cerrarForm()" style="background:none; border:none; color:white; margin-top:20px; width:100%;">Volver atrás</button>
-             </div>
+    <div id="sec-verificar" class="section">
+        <div style="text-align: center; padding: 20px;">
+            <h2 style="color: var(--azul);">Consulta tus Números</h2>
+            <p>Si compraste boleto <b>FÍSICO</b> o <b>DIGITAL</b>, verifícalo aquí:</p>
+            <input type="number" id="v-ws" placeholder="WhatsApp a 10 dígitos" style="width:100%; padding:15px; border-radius:10px; border:2px solid #ddd; margin-bottom:15px; font-size:18px; text-align:center;">
+            <button class="btn-v" onclick="verificarBoletos()">VERIFICAR DISPONIBILIDAD</button>
+            <div id="res-v" style="margin-top:20px; padding:15px; border-radius:10px; display:none;"></div>
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec";
-        let seleccionados = [];
-        let apartadosRemotos = [];
-        let pagadosRemotos = [];
+    <div id="sec-ayuda" class="section">
+        <div class="info-box" style="text-align: left; border-style: solid;">
+            <h3 style="color: var(--azul); margin-top: 0;">📅 Fecha del Sorteo</h3>
+            <p><b>17 de Septiembre de 2026</b><br>Lugar: Acatlán de Osorio, Pue.</p>
+            
+            <h3 style="color: var(--naranja);">🎰 Método de Sorteo</h3>
+            <p>El sorteo se realizará mediante <b>TÓMBOLA EN VIVO</b>. ¡Nada de resultados externos, todo será transparente y en directo!</p>
+            
+            <h3 style="color: var(--azul);">📱 Transmisión</h3>
+            <p>Sigue la tómbola en vivo a través de nuestro Instagram oficial:</p>
+            <a href="https://instagram.com/rifas_el_tecuan" class="ig-badge">@RIFAS_EL_TECUAN</a>
+        </div>
+    </div>
 
-        function switchTab(tab) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('sec-' + tab).classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-            window.scrollTo(0,0);
+    <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE ($<span id="txt-total">0</span>)</button>
+
+    <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none;">
+         <div style="padding:40px 20px; text-align: center;">
+            <h2 style="color:var(--azul)">DATOS DE APARTADO</h2>
+            <p>Tus números: <b id="nums-confirmar" style="color: var(--naranja);"></b></p>
+            <input type="text" id="nombre" placeholder="Nombre Completo" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;">
+            <input type="number" id="whatsapp" placeholder="WhatsApp (10 dígitos)" style="width:100%; padding:15px; margin-bottom:20px; border-radius:10px; border:1px solid #ccc;">
+            <button class="btn-v" style="background: var(--verde-suerte);" onclick="enviar()">CONFIRMAR BOLETOS 🐯</button>
+            <button onclick="cerrarForm()" style="background:none; border:none; color:gray; margin-top:20px; text-decoration:underline;">Regresar a la lista</button>
+         </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec";
+    let seleccionados = [];
+    let apartadosRemotos = [];
+    let pagadosRemotos = [];
+
+    function switchTab(tab) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('sec-' + tab).classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    async function cargar() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        for(let i=1; i <= 2500; i++) {
+            let n = i.toString().padStart(4, '0');
+            let div = document.createElement('div');
+            div.innerText = n; div.id = "n-"+n; div.className = 'num';
+            div.onclick = () => togg(n, div);
+            grid.appendChild(div);
         }
+        try {
+            const r = await fetch(SCRIPT_URL);
+            const data = await r.json();
+            apartadosRemotos = data.apartados || [];
+            pagadosRemotos = data.pagados || [];
+            apartadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num apartado'; });
+            pagadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num pagado'; });
+        } catch (e) { console.log("Conectado"); }
+    }
 
-        async function cargar() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            for(let i=1; i <= 2500; i++) {
-                let n = i.toString().padStart(4, '0');
-                let div = document.createElement('div');
-                div.innerText = n; div.id = "n-"+n; div.className = 'num';
-                div.onclick = () => togg(n, div);
-                grid.appendChild(div);
-            }
-            try {
-                const r = await fetch(SCRIPT_URL);
-                const data = await r.json();
-                apartadosRemotos = data.apartados || [];
-                pagadosRemotos = data.pagados || [];
-                apartadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num apartado'; });
-                pagadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num pagado'; });
-            } catch (e) { console.log("Cargado."); }
+    function togg(n, el) {
+        if(el.classList.contains('apartado') || el.classList.contains('pagado')) return;
+        if(seleccionados.includes(n)) { 
+            seleccionados = seleccionados.filter(x => x !== n); 
+            el.classList.remove('selected'); 
+        } else { 
+            seleccionados.push(n); 
+            el.classList.add('selected'); 
         }
+        const btn = document.getElementById('btn-flotante');
+        btn.style.display = seleccionados.length > 0 ? 'block' : 'none';
+        document.getElementById('txt-total').innerText = seleccionados.length * 50;
+    }
 
-        function togg(n, el) {
-            if(el.classList.contains('apartado') || el.classList.contains('pagado')) return;
-            if(seleccionados.includes(n)) { 
-                seleccionados = seleccionados.filter(x => x !== n); 
-                el.classList.remove('selected'); 
-            } else { 
-                seleccionados.push(n); 
-                el.classList.add('selected'); 
-            }
-            const btn = document.getElementById('btn-flotante');
-            btn.style.display = seleccionados.length > 0 ? 'block' : 'none';
-            document.getElementById('txt-total').innerText = seleccionados.length * 50;
-        }
+    function irAlFormulario() {
+        document.getElementById('nums-confirmar').innerText = seleccionados.join(', ');
+        document.getElementById('sec-datos').style.display = 'block';
+    }
 
-        async function verificarBoletos() {
-            const ws = document.getElementById('v-ws').value;
-            const res = document.getElementById('res-v');
-            if(ws.length < 10) return alert("Número incompleto");
-            res.style.display = "block"; res.style.background = "#222"; res.innerText = "Consultando...";
-            try {
-                const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
-                const data = await r.json();
-                if(data.encontrados && data.encontrados.length > 0) {
-                    res.style.background = "rgba(37, 211, 102, 0.2)";
-                    res.innerHTML = `✅ <b>${data.nombre}</b>, tus boletos:<br><span style="font-size:20px; color:var(--primary)">${data.encontrados.join(', ')}</span>`;
-                } else { res.innerText = "❌ No hay boletos con este número."; }
-            } catch (e) { res.innerText = "Error de conexión."; }
-        }
+    function cerrarForm() { document.getElementById('sec-datos').style.display = 'none'; }
 
-        function irAlFormulario() { document.getElementById('sec-datos').classList.add('active'); }
-        function cerrarForm() { document.getElementById('sec-datos').classList.remove('active'); }
+    async function verificarBoletos() {
+        const ws = document.getElementById('v-ws').value;
+        const res = document.getElementById('res-v');
+        if(ws.length < 10) return alert("Ingresa tu número de WhatsApp");
+        res.style.display = "block"; res.style.background = "#eee"; res.innerText = "Buscando en tómbola...";
+        try {
+            const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
+            const data = await r.json();
+            if(data.encontrados && data.encontrados.length > 0) {
+                res.style.background = "#dff0d8";
+                res.innerHTML = `✅ <b>${data.nombre}</b>, tus números:<br><span style="font-size:20px; color:var(--azul)">${data.encontrados.join(', ')}</span>`;
+            } else { res.innerText = "❌ No se encontraron boletos. Si compraste uno físico, espera a que lo registremos en el sistema."; }
+        } catch (e) { res.innerText = "Error de conexión."; }
+    }
 
-        async function buscarNumero() {
-            let n = document.getElementById('busc').value.padStart(4, '0');
-            let el = document.getElementById("n-"+n);
-            if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); togg(n, el); }
-            else { alert("Número no válido"); }
-        }
+    function buscarNumero() {
+        let n = document.getElementById('busc').value.padStart(4, '0');
+        let el = document.getElementById("n-"+n);
+        if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); }
+        else { alert("Número fuera de rango (0001-2500)"); }
+    }
 
-        async function enviar() {
-            const n = document.getElementById('nombre').value;
-            const w = document.getElementById('whatsapp').value;
-            if(!n || !w) return alert("Datos incompletos");
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: "Web", municipio: "Web" }) });
-            const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n*BOLETOS:* ${seleccionados.join(', ')}\n*TOTAL:* $${seleccionados.length * 50}\n*NOMBRE:* ${n}`;
-            window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-        }
+    async function enviar() {
+        const n = document.getElementById('nombre').value;
+        const w = document.getElementById('whatsapp').value;
+        if(!n || !w) return alert("Completa tus datos");
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: "Web-Fisico", municipio: "Acatlán" }) });
+        const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n*SORTEO:* Cuatrimoto Vento 200\n*BOLETOS:* ${seleccionados.join(', ')}\n*NOMBRE:* ${n}\n\n_Apartado vía Web_`;
+        window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+    }
 
-        cargar();
-    </script>
+    cargar();
+</script>
 </body>
 </html>
