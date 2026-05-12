@@ -144,16 +144,39 @@
         document.getElementById('sec-' + tab).classList.add('active');
     }
 
-    async function cargar() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        for(let i=1; i <= 2500; i++) {
-            let n = i.toString().padStart(4, '0');
-            let div = document.createElement('div');
-            div.innerText = n; div.id = "n-"+n; div.className = 'num';
-            div.onclick = () => togg(n, div);
-            grid.appendChild(div);
-        }
+   async function cargar() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    // Crear los 2500 boletos visuales
+    for(let i=1; i <= 2500; i++) {
+        let n = i.toString().padStart(4, '0');
+        let div = document.createElement('div');
+        div.innerText = n; div.id = "n-"+n; div.className = 'num';
+        div.onclick = () => togg(n, div);
+        grid.appendChild(div);
+    }
+    try {
+        const r = await fetch(SCRIPT_URL);
+        const data = await r.json();
+        
+        // FUNCIÓN MEJORADA: Bloquea aunque no tengan ceros en el Sheets
+        const bloquear = (lista, clase) => {
+            lista.forEach(nRaw => {
+                // Esto convierte "178" en "0178" automáticamente antes de buscarlo
+                let nFormateado = nRaw.toString().trim().padStart(4, '0');
+                let el = document.getElementById("n-" + nFormateado);
+                if(el) el.className = 'num ' + clase;
+            });
+        };
+
+        bloquear(data.apartados || [], 'apartado');
+        bloquear(data.pagados || [], 'pagado');
+        
+        const total = (data.apartados?.length || 0) + (data.pagados?.length || 0);
+        document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
+        
+    } catch (e) { console.error("Error cargando boletos", e); }
+}
         try {
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
