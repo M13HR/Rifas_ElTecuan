@@ -3,206 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Vento Gladiator 2.0</title>
+    <title>Rifas El Tecuan - Vento Gladiator</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --primary: #25d366; --gold: #ffd700; --bg: #0a0a0a; --card: #161616; }
-        body { font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; margin: 0; padding: 5px; padding-bottom: 100px; }
-        .app { width: 100%; max-width: 450px; background: var(--card); border-radius: 25px; border: 1px solid #333; margin: auto; overflow: hidden; text-align: center; }
+        body { font-family: 'Arial Black', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 100px; }
+        .app { width: 100%; max-width: 450px; background: var(--card); margin: auto; min-height: 100vh; position: relative; border-left: 1px solid #333; border-right: 1px solid #333; }
         
-        .hero { background: linear-gradient(180deg, #1b4d2b 0%, #0a0a0a 100%); padding: 20px; border-bottom: 3px solid var(--primary); }
-        .logo-img { width: 80px; margin-bottom: 10px; }
-        .hero h1 { color: var(--gold); font-size: 18px; margin: 0; }
-        .date-badge { background: #e74c3c; color: white; font-size: 11px; padding: 5px 12px; border-radius: 50px; margin-top: 8px; display: inline-block; }
+        .hero { background: linear-gradient(180deg, #1b4d2b 0%, #0a0a0a 100%); padding: 20px; text-align: center; border-bottom: 3px solid var(--primary); }
+        .logo-img { width: 80px; }
+        
+        /* MENÚ DE NAVEGACIÓN ESTILO APP */
+        .nav-tabs { display: flex; background: #222; border-bottom: 1px solid #444; sticky: top; position: sticky; top: 0; z-index: 100; }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 11px; color: #888; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #111; }
 
-        .promo-img { width: 85%; max-height: 200px; object-fit: contain; border-radius: 15px; margin: 10px auto; display: block; border: 1px solid #333; }
-        .price-badge { background: white; color: black; padding: 5px 15px; border-radius: 50px; font-size: 16px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        /* SECCIONES */
+        .section { display: none; padding: 15px; animation: fadeIn 0.4s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* VERIFICADOR */
-        .verificador-box { background: #111; margin: 10px; padding: 15px; border-radius: 15px; border: 1px solid var(--gold); }
-        .verificador-box h3 { font-size: 14px; color: var(--gold); margin-top: 0; }
-        .v-input-group { display: flex; gap: 5px; }
-        .v-input-group input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; font-size: 14px; }
-        .btn-verificar { background: var(--gold); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        #resultado-verificador { font-size: 12px; margin-top: 10px; color: var(--primary); display: none; background: #000; padding: 8px; border-radius: 8px; }
+        /* BOTONES Y TARJETAS */
+        .promo-img { width: 90%; max-height: 180px; object-fit: contain; border-radius: 15px; margin: 10px auto; display: block; }
+        .price-badge { background: white; color: black; padding: 5px 15px; border-radius: 50px; font-size: 16px; font-weight: bold; margin: 10px auto; display: table; }
 
-        .search-area { background: #222; margin: 10px; padding: 15px; border-radius: 15px; }
-        .input-group { display: flex; gap: 8px; }
-        .input-group input { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #444; background: #000; color: white; font-size: 18px; text-align: center; }
-        .btn-buscar { background: var(--gold); border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* ESTILO VERIFICADOR */
+        .verificador-ui { background: #111; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; }
+        .verificador-ui h2 { color: var(--gold); font-size: 18px; margin-bottom: 20px; }
+        .v-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #000; color: white; font-size: 18px; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-v { background: var(--primary); color: black; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 16px; }
 
-        .combos-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px; }
-        .combo-card { background: #111; padding: 10px 2px; border-radius: 10px; border: 1px solid #444; cursor: pointer; font-size: 11px; }
-        .combo-card b { display: block; color: var(--primary); font-size: 14px; }
-
-        #carrito-lucky { display: none; background: #000; margin: 10px; padding: 12px; border-radius: 12px; border: 1px solid var(--primary); }
-        .lucky-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 8px; }
-        .tag { background: var(--primary); color: black; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-
-        .grid-header { font-size: 10px; color: #666; margin-bottom: 5px; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; height: 350px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; margin: 10px; border: 1px solid #222; }
-        .num { padding: 12px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: #aaa; }
+        /* CUADRÍCULA */
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; height: 500px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; border: 1px solid #222; }
+        .num { padding: 12px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-size: 12px; color: #aaa; text-align: center; }
         .num.selected { background: var(--primary) !important; color: black !important; }
         .num.apartado { background: #333; color: #555; cursor: not-allowed; }
         .num.pagado { background: #c0392b; color: white; opacity: 0.5; }
         
         .btn-flotante { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: black; border: none; padding: 15px; border-radius: 40px; font-size: 15px; font-weight: bold; width: 80%; box-shadow: 0 5px 20px rgba(0,255,0,0.3); z-index: 1000; display: none; }
-
-        #seccion-datos { display: none; padding: 20px; background: #1a1a1a; border-radius: 20px; margin: 10px; border: 1px solid #333; }
-        input, select { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; font-size: 15px; box-sizing: border-box; }
-        .btn-enviar { background: var(--primary); color: black; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; }
+        
+        #res-v { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="hero">
             <img src="Logo Rifas el tecuan.png" class="logo-img">
-            <h1>VENTO GLADIATOR 2.0</h1>
-            <div class="date-badge">📅 17 SEPTIEMBRE 2026</div>
+            <div style="color: var(--gold); font-size: 14px;">RIFAS EL TECUAN 🐯</div>
         </div>
 
-        <img src="Para rifas 17 Pro Max.jpeg" class="promo-img">
-        <div class="price-badge">$50 x BOLETO</div>
+        <div class="nav-tabs">
+            <div class="tab active" id="tab-boletos" onclick="switchTab('boletos')">🎟️ BOLETOS</div>
+            <div class="tab" id="tab-verificar" onclick="switchTab('verificar')">🔍 VERIFICAR</div>
+            <div class="tab" id="tab-ayuda" onclick="switchTab('ayuda')">❓ AYUDA</div>
+        </div>
 
-        <div class="verificador-box">
-            <h3>🔍 VERIFICADOR DE BOLETOS</h3>
-            <div class="v-input-group">
-                <input type="number" id="v-whatsapp" placeholder="Tu WhatsApp a 10 dígitos">
-                <button class="btn-verificar" onclick="verificarBoletos()">VERIFICAR</button>
+        <div id="sec-boletos" class="section active">
+            <img src="Para rifas 17 Pro Max.jpeg" class="promo-img">
+            <div class="price-badge">$50 x BOLETO</div>
+            
+            <div style="background: #222; padding: 10px; border-radius: 15px; margin-bottom: 15px;">
+                <input type="number" id="busc" placeholder="Busca tu número favorito" style="width:70%; padding:10px; border-radius:8px; border:none; background:#000; color:white;">
+                <button onclick="buscarNumero()" style="width:25%; padding:10px; border-radius:8px; background:var(--gold); border:none; font-weight:bold;">IR</button>
             </div>
-            <div id="resultado-verificador"></div>
+
+            <div id="grid" class="grid">Cargando 2,500 boletos...</div>
         </div>
 
-        <div class="search-area">
-            <div class="input-group">
-                <input type="number" id="input-busqueda" placeholder="Busca tu número (0001-2500)">
-                <button class="btn-buscar" onclick="buscarNumero()">BUSCAR</button>
+        <div id="sec-verificar" class="section">
+            <div class="verificador-ui">
+                <h2>¿YA APARTASTE?</h2>
+                <p style="font-size: 12px; color: #aaa;">Consulta tus números con tu WhatsApp</p>
+                <input type="number" id="v-ws" class="v-input" placeholder="Ej: 9531024519">
+                <button class="btn-v" onclick="verificarBoletos()">BUSCAR MIS BOLETOS</button>
+                <div id="res-v"></div>
             </div>
         </div>
 
-        <div class="combos-container">
-            <div class="combo-card" onclick="maquinaSuerte(1)"><span>1 BOLETO</span><b>$50</b></div>
-            <div class="combo-card" onclick="maquinaSuerte(5)"><span>5 BOLETOS</span><b>$250</b></div>
-            <div class="combo-card" onclick="maquinaSuerte(10)"><span>10 BOLETOS</span><b>$500</b></div>
+        <div id="sec-ayuda" class="section">
+            <div style="background:#111; padding:20px; border-radius:15px; line-height: 1.6;">
+                <h3 style="color:var(--gold)">¿Cómo participar?</h3>
+                <ol style="font-size: 14px; color: #ccc; padding-left: 20px;">
+                    <li>Elige tus números en la pestaña <b>BOLETOS</b>.</li>
+                    <li>Presiona el botón verde de "APARTAR".</li>
+                    <li>Envía tu captura por WhatsApp.</li>
+                    <li>Tienes 6 horas para realizar tu pago.</li>
+                </ol>
+                <p style="font-size: 12px; border-top: 1px solid #333; padding-top: 10px;">Basado en la Lotería Nacional del 17 de Septiembre 2026.</p>
+            </div>
         </div>
 
-        <div id="carrito-lucky">
-            <div id="tags-contenedor" class="lucky-tags"></div>
-        </div>
+        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE ($<span id="txt-total">0</span>)</button>
 
-        <div class="grid-header">LISTA DE BOLETOS (0001 - 2500)</div>
-        <div id="grid" class="grid">Cargando lista completa...</div>
-
-        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE 🐯</button>
-
-        <div id="seccion-datos">
-            <h2 style="color: var(--gold); font-size: 16px;">COMPLETA TU REGISTRO</h2>
-            <input type="text" id="nombre" placeholder="Nombre completo">
-            <input type="number" id="whatsapp" placeholder="WhatsApp (10 dígitos)">
-            <select id="estado">
-                <option value="" disabled selected>Estado</option>
-                <option value="Puebla">Puebla</option><option value="Oaxaca">Oaxaca</option>
-                <option value="CDMX">CDMX</option><option value="Veracruz">Veracruz</option>
-            </select>
-            <input type="text" id="municipio" placeholder="Municipio">
-            <button id="btn-final" class="btn-enviar" onclick="enviar()">CONFIRMAR APARTADO 🐯</button>
+        <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; box-sizing:border-box;">
+             <div style="padding:40px 20px;">
+                <h2 style="color:var(--gold)">REGISTRO FINAL</h2>
+                <input type="text" id="nombre" class="v-input" placeholder="Tu nombre">
+                <input type="number" id="whatsapp" class="v-input" placeholder="Tu WhatsApp">
+                <button class="btn-v" onclick="enviar()">CONFIRMAR Y ENVIAR 🐯</button>
+                <button onclick="cerrarForm()" style="background:none; border:none; color:white; margin-top:20px; width:100%;">Volver atrás</button>
+             </div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKuFUaEB0kd7QFttXIVLWI0ktIMKKEiDD2ZLoazfOzl0ZpQ-rUFM2KtFNhhpR25X0C5w/exec";
         let seleccionados = [];
         let apartadosRemotos = [];
         let pagadosRemotos = [];
-        let baseDeDatosCompleta = []; // Para el verificador
+
+        function switchTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('sec-' + tab).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            window.scrollTo(0,0);
+        }
 
         async function cargar() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            
-            // CARGA LOS 2500 DE GOLPE
             for(let i=1; i <= 2500; i++) {
                 let n = i.toString().padStart(4, '0');
-                crearBoleto(n, grid);
+                let div = document.createElement('div');
+                div.innerText = n; div.id = "n-"+n; div.className = 'num';
+                div.onclick = () => togg(n, div);
+                grid.appendChild(div);
             }
-
             try {
                 const r = await fetch(SCRIPT_URL);
                 const data = await r.json();
                 apartadosRemotos = data.apartados || [];
                 pagadosRemotos = data.pagados || [];
-                baseDeDatosCompleta = data.raw || []; // Necesitas actualizar tu Apps Script para esto opcionalmente
-
-                // Pintar estados
-                apartadosRemotos.forEach(n => {
-                    let el = document.getElementById("n-"+n);
-                    if(el) el.className = 'num apartado';
-                });
-                pagadosRemotos.forEach(n => {
-                    let el = document.getElementById("n-"+n);
-                    if(el) el.className = 'num pagado';
-                });
-            } catch (e) { console.log("Conectado."); }
-        }
-
-        function crearBoleto(n, contenedor) {
-            let div = document.createElement('div');
-            div.innerText = n; div.id = "n-"+n;
-            div.className = 'num';
-            div.onclick = () => togg(n, div);
-            contenedor.appendChild(div);
-        }
-
-        async function verificarBoletos() {
-            const ws = document.getElementById('v-whatsapp').value;
-            const res = document.getElementById('resultado-verificador');
-            if(ws.length < 10) return alert("Ingresa un número válido.");
-            
-            res.style.display = "block";
-            res.innerText = "Buscando tus boletos...";
-
-            try {
-                const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
-                const data = await r.json();
-                if(data.encontrados && data.encontrados.length > 0) {
-                    res.innerHTML = `✅ Hola <b>${data.nombre}</b>, tienes apartados: <br> ${data.encontrados.join(', ')}`;
-                } else {
-                    res.innerText = "❌ No se encontraron boletos con este número.";
-                }
-            } catch (e) { res.innerText = "Error al conectar con la base de datos."; }
-        }
-
-        async function buscarNumero() {
-            let n = document.getElementById('input-busqueda').value.padStart(4, '0');
-            if(parseInt(n) < 1 || parseInt(n) > 2500) return alert("Rango: 0001-2500");
-
-            if(pagadosRemotos.includes(n) || apartadosRemotos.includes(n)) {
-                return alert("Ese número ya está ocupado.");
-            }
-
-            if(!seleccionados.includes(n)) {
-                seleccionados.push(n);
-                let el = document.getElementById("n-"+n);
-                if(el) { el.classList.add('selected'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
-                confetti({ particleCount: 30, spread: 30 });
-            }
-            actualizar();
-        }
-
-        function maquinaSuerte(cant) {
-            let encontrados = 0;
-            let bucle = 0;
-            while(encontrados < cant && bucle < 500) {
-                let azar = Math.floor(Math.random() * 2500 + 1).toString().padStart(4, '0');
-                if(!apartadosRemotos.includes(azar) && !pagadosRemotos.includes(azar) && !seleccionados.includes(azar)) {
-                    seleccionados.push(azar);
-                    let el = document.getElementById("n-"+azar);
-                    if(el) el.classList.add('selected');
-                    encontrados++;
-                }
-                bucle++;
-            }
-            actualizar();
+                apartadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num apartado'; });
+                pagadosRemotos.forEach(n => { let el = document.getElementById("n-"+n); if(el) el.className = 'num pagado'; });
+            } catch (e) { console.log("Cargado."); }
         }
 
         function togg(n, el) {
@@ -214,59 +149,43 @@
                 seleccionados.push(n); 
                 el.classList.add('selected'); 
             }
-            actualizar();
+            const btn = document.getElementById('btn-flotante');
+            btn.style.display = seleccionados.length > 0 ? 'block' : 'none';
+            document.getElementById('txt-total').innerText = seleccionados.length * 50;
         }
 
-        function actualizar() {
-            const carrito = document.getElementById('carrito-lucky');
-            const contenedor = document.getElementById('tags-contenedor');
-            const btnFlotante = document.getElementById('btn-flotante');
-            contenedor.innerHTML = '';
-            if(seleccionados.length > 0) {
-                carrito.style.display = 'block';
-                btnFlotante.style.display = (document.getElementById('seccion-datos').style.display === 'block') ? 'none' : 'block';
-                seleccionados.forEach(n => {
-                    const tag = document.createElement('div'); tag.className = 'tag';
-                    tag.innerHTML = `${n} <span onclick="quitarNumero('${n}')">×</span>`;
-                    contenedor.appendChild(tag);
-                });
-            } else { carrito.style.display = 'none'; btnFlotante.style.display = 'none'; }
+        async function verificarBoletos() {
+            const ws = document.getElementById('v-ws').value;
+            const res = document.getElementById('res-v');
+            if(ws.length < 10) return alert("Número incompleto");
+            res.style.display = "block"; res.style.background = "#222"; res.innerText = "Consultando...";
+            try {
+                const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
+                const data = await r.json();
+                if(data.encontrados && data.encontrados.length > 0) {
+                    res.style.background = "rgba(37, 211, 102, 0.2)";
+                    res.innerHTML = `✅ <b>${data.nombre}</b>, tus boletos:<br><span style="font-size:20px; color:var(--primary)">${data.encontrados.join(', ')}</span>`;
+                } else { res.innerText = "❌ No hay boletos con este número."; }
+            } catch (e) { res.innerText = "Error de conexión."; }
         }
 
-        function quitarNumero(n) {
-            seleccionados = seleccionados.filter(x => x !== n);
+        function irAlFormulario() { document.getElementById('sec-datos').classList.add('active'); }
+        function cerrarForm() { document.getElementById('sec-datos').classList.remove('active'); }
+
+        async function buscarNumero() {
+            let n = document.getElementById('busc').value.padStart(4, '0');
             let el = document.getElementById("n-"+n);
-            if(el) el.classList.remove('selected');
-            actualizar();
-        }
-
-        function irAlFormulario() {
-            document.getElementById('btn-flotante').style.display = 'none';
-            document.getElementById('seccion-datos').style.display = 'block';
-            document.getElementById('seccion-datos').scrollIntoView({ behavior: 'smooth' });
+            if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); togg(n, el); }
+            else { alert("Número no válido"); }
         }
 
         async function enviar() {
             const n = document.getElementById('nombre').value;
             const w = document.getElementById('whatsapp').value;
-            const est = document.getElementById('estado').value;
-            const mun = document.getElementById('municipio').value;
-            if(!n || !w) return alert("Faltan datos.");
-            
-            const btn = document.getElementById('btn-final');
-            btn.innerText = "🐯 REGISTRANDO..."; btn.disabled = true;
-
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) });
-
-            let total = seleccionados.length * 50;
-            const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n` +
-                        `🏍️ *RIFA:* Vento Gladiator 2.0\n` +
-                        `👤 *CLIENTE:* ${n}\n` +
-                        `🔢 *BOLETOS:* ${seleccionados.join(', ')}\n` +
-                        `💰 *TOTAL:* $${total} MXN\n` +
-                        `*Pago en 6 horas.*`;
-            
-            setTimeout(() => { window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`; }, 800);
+            if(!n || !w) return alert("Datos incompletos");
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: "Web", municipio: "Web" }) });
+            const msj = `📱 *RIFAS EL TECUAN* 🐯\n\n*BOLETOS:* ${seleccionados.join(', ')}\n*TOTAL:* $${seleccionados.length * 50}\n*NOMBRE:* ${n}`;
+            window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
         }
 
         cargar();
