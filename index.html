@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rifas El Tecuan - Vento Gladiator</title>
+    <title>Rifas El Tecuan - Vento Gladiator 2.0</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --primary: #25d366; --gold: #ffd700; --bg: #0a0a0a; --card: #161616; }
@@ -15,23 +15,20 @@
         .hero h1 { color: var(--gold); font-size: 18px; margin: 0; }
         .date-badge { background: #e74c3c; color: white; font-size: 11px; padding: 5px 12px; border-radius: 50px; margin-top: 8px; display: inline-block; }
 
-        /* FOTO OPTIMIZADA */
-        .promo-img { 
-            width: 85%; 
-            max-height: 200px; /* Evita que se vea gigante */
-            object-fit: contain; 
-            border-radius: 15px; 
-            margin: 10px auto; 
-            display: block; 
-            border: 1px solid #333;
-        }
-
+        .promo-img { width: 85%; max-height: 200px; object-fit: contain; border-radius: 15px; margin: 10px auto; display: block; border: 1px solid #333; }
         .price-badge { background: white; color: black; padding: 5px 15px; border-radius: 50px; font-size: 16px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+
+        /* VERIFICADOR */
+        .verificador-box { background: #111; margin: 10px; padding: 15px; border-radius: 15px; border: 1px solid var(--gold); }
+        .verificador-box h3 { font-size: 14px; color: var(--gold); margin-top: 0; }
+        .v-input-group { display: flex; gap: 5px; }
+        .v-input-group input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; font-size: 14px; }
+        .btn-verificar { background: var(--gold); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        #resultado-verificador { font-size: 12px; margin-top: 10px; color: var(--primary); display: none; background: #000; padding: 8px; border-radius: 8px; }
 
         .search-area { background: #222; margin: 10px; padding: 15px; border-radius: 15px; }
         .input-group { display: flex; gap: 8px; }
         .input-group input { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #444; background: #000; color: white; font-size: 18px; text-align: center; }
-        #scan-msg { font-size: 11px; color: var(--primary); font-family: monospace; height: 14px; margin-bottom: 4px; opacity: 0; }
         .btn-buscar { background: var(--gold); border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
         .combos-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px; }
@@ -42,10 +39,9 @@
         .lucky-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 8px; }
         .tag { background: var(--primary); color: black; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
 
-        /* CUADRÍCULA OPTIMIZADA */
         .grid-header { font-size: 10px; color: #666; margin-bottom: 5px; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; height: 300px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; margin: 10px; border: 1px solid #222; }
-        .num { padding: 10px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: #aaa; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; height: 350px; overflow-y: auto; background: #000; padding: 10px; border-radius: 12px; margin: 10px; border: 1px solid #222; }
+        .num { padding: 12px 0; background: #1e1e1e; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; color: #aaa; }
         .num.selected { background: var(--primary) !important; color: black !important; }
         .num.apartado { background: #333; color: #555; cursor: not-allowed; }
         .num.pagado { background: #c0392b; color: white; opacity: 0.5; }
@@ -68,10 +64,18 @@
         <img src="Para rifas 17 Pro Max.jpeg" class="promo-img">
         <div class="price-badge">$50 x BOLETO</div>
 
+        <div class="verificador-box">
+            <h3>🔍 VERIFICADOR DE BOLETOS</h3>
+            <div class="v-input-group">
+                <input type="number" id="v-whatsapp" placeholder="Tu WhatsApp a 10 dígitos">
+                <button class="btn-verificar" onclick="verificarBoletos()">VERIFICAR</button>
+            </div>
+            <div id="resultado-verificador"></div>
+        </div>
+
         <div class="search-area">
-            <div id="scan-msg"></div>
             <div class="input-group">
-                <input type="number" id="input-busqueda" placeholder="Busca tu número">
+                <input type="number" id="input-busqueda" placeholder="Busca tu número (0001-2500)">
                 <button class="btn-buscar" onclick="buscarNumero()">BUSCAR</button>
             </div>
         </div>
@@ -83,17 +87,16 @@
         </div>
 
         <div id="carrito-lucky">
-            <div style="font-size: 11px; color: var(--gold);">LISTO PARA APARTAR:</div>
             <div id="tags-contenedor" class="lucky-tags"></div>
         </div>
 
-        <div class="grid-header">Mostrando sugerencias (0001 - 0500)</div>
-        <div id="grid" class="grid">Cargando...</div>
+        <div class="grid-header">LISTA DE BOLETOS (0001 - 2500)</div>
+        <div id="grid" class="grid">Cargando lista completa...</div>
 
-        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR NÚMEROS 🍀</button>
+        <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR MI SUERTE 🐯</button>
 
         <div id="seccion-datos">
-            <h2 style="color: var(--gold); font-size: 16px;">REGISTRO</h2>
+            <h2 style="color: var(--gold); font-size: 16px;">COMPLETA TU REGISTRO</h2>
             <input type="text" id="nombre" placeholder="Nombre completo">
             <input type="number" id="whatsapp" placeholder="WhatsApp (10 dígitos)">
             <select id="estado">
@@ -102,7 +105,7 @@
                 <option value="CDMX">CDMX</option><option value="Veracruz">Veracruz</option>
             </select>
             <input type="text" id="municipio" placeholder="Municipio">
-            <button id="btn-final" class="btn-enviar" onclick="enviar()">CONFIRMAR 🐯</button>
+            <button id="btn-final" class="btn-enviar" onclick="enviar()">CONFIRMAR APARTADO 🐯</button>
         </div>
     </div>
 
@@ -111,65 +114,85 @@
         let seleccionados = [];
         let apartadosRemotos = [];
         let pagadosRemotos = [];
+        let baseDeDatosCompleta = []; // Para el verificador
 
         async function cargar() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            // CARGA LOS 2500 DE GOLPE
+            for(let i=1; i <= 2500; i++) {
+                let n = i.toString().padStart(4, '0');
+                crearBoleto(n, grid);
+            }
+
             try {
                 const r = await fetch(SCRIPT_URL);
                 const data = await r.json();
-                apartadosRemotos = data.apartados;
-                pagadosRemotos = data.pagados;
+                apartadosRemotos = data.apartados || [];
+                pagadosRemotos = data.pagados || [];
+                baseDeDatosCompleta = data.raw || []; // Necesitas actualizar tu Apps Script para esto opcionalmente
 
-                const grid = document.getElementById('grid');
-                grid.innerHTML = '';
-                // CARGA SOLO 500 PARA QUE NO SE TRABE
-                for(let i=1; i <= 500; i++) {
-                    let n = i.toString().padStart(4, '0');
-                    crearBoleto(n, grid);
-                }
-            } catch (e) { document.getElementById('grid').innerText = "Lista lista."; }
+                // Pintar estados
+                apartadosRemotos.forEach(n => {
+                    let el = document.getElementById("n-"+n);
+                    if(el) el.className = 'num apartado';
+                });
+                pagadosRemotos.forEach(n => {
+                    let el = document.getElementById("n-"+n);
+                    if(el) el.className = 'num pagado';
+                });
+            } catch (e) { console.log("Conectado."); }
         }
 
         function crearBoleto(n, contenedor) {
             let div = document.createElement('div');
             div.innerText = n; div.id = "n-"+n;
-            if (pagadosRemotos.includes(n)) div.className = 'num pagado';
-            else if (apartadosRemotos.includes(n)) div.className = 'num apartado';
-            else { 
-                div.className = 'num'; 
-                div.onclick = () => togg(n, div); 
-                if(seleccionados.includes(n)) div.classList.add('selected');
-            }
+            div.className = 'num';
+            div.onclick = () => togg(n, div);
             contenedor.appendChild(div);
+        }
+
+        async function verificarBoletos() {
+            const ws = document.getElementById('v-whatsapp').value;
+            const res = document.getElementById('resultado-verificador');
+            if(ws.length < 10) return alert("Ingresa un número válido.");
+            
+            res.style.display = "block";
+            res.innerText = "Buscando tus boletos...";
+
+            try {
+                const r = await fetch(SCRIPT_URL + "?verificar=" + ws);
+                const data = await r.json();
+                if(data.encontrados && data.encontrados.length > 0) {
+                    res.innerHTML = `✅ Hola <b>${data.nombre}</b>, tienes apartados: <br> ${data.encontrados.join(', ')}`;
+                } else {
+                    res.innerText = "❌ No se encontraron boletos con este número.";
+                }
+            } catch (e) { res.innerText = "Error al conectar con la base de datos."; }
         }
 
         async function buscarNumero() {
             let n = document.getElementById('input-busqueda').value.padStart(4, '0');
-            const scanMsg = document.getElementById('scan-msg');
             if(parseInt(n) < 1 || parseInt(n) > 2500) return alert("Rango: 0001-2500");
 
-            scanMsg.style.opacity = "1";
-            scanMsg.innerText = ">> Verificando...";
-            await new Promise(r => setTimeout(r, 600));
-
             if(pagadosRemotos.includes(n) || apartadosRemotos.includes(n)) {
-                scanMsg.innerText = ">> NO DISPONIBLE ❌";
-                return;
+                return alert("Ese número ya está ocupado.");
             }
 
             if(!seleccionados.includes(n)) {
                 seleccionados.push(n);
                 let el = document.getElementById("n-"+n);
-                if(el) el.classList.add('selected');
-                confetti({ particleCount: 40, spread: 30 });
+                if(el) { el.classList.add('selected'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+                confetti({ particleCount: 30, spread: 30 });
             }
-            scanMsg.style.opacity = "0";
             actualizar();
         }
 
         function maquinaSuerte(cant) {
             let encontrados = 0;
             let bucle = 0;
-            while(encontrados < cant && bucle < 300) {
+            while(encontrados < cant && bucle < 500) {
                 let azar = Math.floor(Math.random() * 2500 + 1).toString().padStart(4, '0');
                 if(!apartadosRemotos.includes(azar) && !pagadosRemotos.includes(azar) && !seleccionados.includes(azar)) {
                     seleccionados.push(azar);
@@ -183,6 +206,7 @@
         }
 
         function togg(n, el) {
+            if(el.classList.contains('apartado') || el.classList.contains('pagado')) return;
             if(seleccionados.includes(n)) { 
                 seleccionados = seleccionados.filter(x => x !== n); 
                 el.classList.remove('selected'); 
@@ -230,7 +254,7 @@
             if(!n || !w) return alert("Faltan datos.");
             
             const btn = document.getElementById('btn-final');
-            btn.innerText = "REGISTRANDO..."; btn.disabled = true;
+            btn.innerText = "🐯 REGISTRANDO..."; btn.disabled = true;
 
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre:n, whatsapp:w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) });
 
