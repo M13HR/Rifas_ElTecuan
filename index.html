@@ -240,25 +240,30 @@
     }
 
 async function enviar() {
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXggfYMq1FaUcRkvcX6yG9uZClkAHeHaEZ2LFMwI8Ox0LUlsiiT23rwavPRc3V9AI-0Q/exec";
   const n = document.getElementById('nombre').value;
   const w = document.getElementById('whatsapp').value;
   const est = document.getElementById('estado').value;
   const mun = document.getElementById('municipio').value;
-  const btn = document.querySelector('.btn-confirmar'); // Busca el botón de confirmación
+  const btn = document.querySelector('.btn-confirmar') || document.querySelector('button[onclick="enviar()"]');
 
   if (!n || !w || !est || !mun) return alert("Por favor, llena todos los campos");
 
-  // BLOQUEO DE BOTÓN: Evita que el usuario presione varias veces
+  // Bloqueo de seguridad para evitar múltiples clics
   if (btn) {
     btn.disabled = true;
     btn.innerText = "Verificando disponibilidad...";
-    btn.style.backgroundColor = "#ccc"; // Cambia a gris para que se note el bloqueo
+    btn.style.backgroundColor = "#ccc";
   }
 
   try {
+    // Usamos 'text/plain' para evitar problemas de pre-flight CORS con Google Apps Script
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'cors',
+      mode: 'cors', 
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
       body: JSON.stringify({ 
         nombre: n, 
         whatsapp: w, 
@@ -271,7 +276,6 @@ async function enviar() {
     const resultado = await response.json();
 
     if (resultado.status === "OK") {
-      // ÉXITO: Lanzamos confeti y enviamos a WhatsApp
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
       
       const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
@@ -280,18 +284,18 @@ async function enviar() {
         window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
       }, 1000);
     } else {
-      // ERROR: El boleto ya se ganó o hay saturación
-      alert("¡Lo sentimos! Uno o más números seleccionados ya fueron apartados mientras llenabas el formulario. La página se actualizará para mostrar los disponibles.");
+      alert("Error: " + (resultado.message || "El número ya no está disponible."));
       location.reload();
     }
 
   } catch (e) {
-    console.error(e);
-    alert("Hubo un problema al conectar con el servidor. Revisa tu internet o intenta de nuevo.");
+    console.error("Error capturado:", e);
+    // Si hay error de CORS pero el registro se hizo (común en Google), podrías optar por recargar
+    alert("Hubo un problema al confirmar. Por favor, verifica si recibiste confirmación o reintenta.");
     if (btn) {
       btn.disabled = false;
       btn.innerText = "Confirmar Apartado";
-      btn.style.backgroundColor = ""; // Regresa al color original
+      btn.style.backgroundColor = "";
     }
   }
 }
