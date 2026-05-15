@@ -146,7 +146,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpb-8Xah4mfceCdM5su7ImoK_u-lWLS15Ad01-GUFYmoZNMEc4wJFkMZh1XYH_mHwc_A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGwZdaWMacYRffmvEkchpHVRvTPZkFjwdj5m8szRV0dhbPrQgpjKHtb8W5YVr13MGZzQ/exec";
     let seleccionados = [];
     let datosCargados = false;
 
@@ -255,38 +255,45 @@
 
     function cerrarForm() { document.getElementById('sec-datos').style.display = 'none'; }
 
-    async function enviar() {
-        const n = document.getElementById('nombre').value;
-        const w = document.getElementById('whatsapp').value;
-        const est = document.getElementById('estado').value;
-        const mun = document.getElementById('municipio').value;
-        const btn = document.querySelector('button[onclick="enviar()"]');
+async function enviar() {
+    const n = document.getElementById('nombre').value;
+    const w = document.getElementById('whatsapp').value;
+    const est = document.getElementById('estado').value;
+    const mun = document.getElementById('municipio').value;
+    const btn = document.querySelector('button[onclick="enviar()"]');
 
-        if (!n || !w) return alert("Nombre y WhatsApp son obligatorios");
-        btn.disabled = true; btn.innerText = "PROCESANDO...";
+    if (!n || !w) return alert("Nombre y WhatsApp son obligatorios");
 
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    nombre: n, whatsapp: w, boletos: seleccionados.join(', '), 
-                    estadoRep: est, municipio: mun 
-                })
-            });
+    btn.disabled = true; 
+    btn.innerText = "PROCESANDO...";
 
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            setTimeout(() => {
-                const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*BOLETOS:* ${seleccionados.join(', ')}`;
-                window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-            }, 1000);
-        } catch (e) {
-            alert("Error al enviar. Intenta de nuevo.");
-            btn.disabled = false; btn.innerText = "CONFIRMAR APARTADO";
-        }
+    // MÉTODO DE EMERGENCIA: Usamos parámetros de URL (Query Params)
+    // Esto evita todos los problemas de seguridad y bloqueos de Google
+    const urlFinal = SCRIPT_URL + 
+        "?nombre=" + encodeURIComponent(n) + 
+        "&whatsapp=" + encodeURIComponent(w) + 
+        "&boletos=" + encodeURIComponent(seleccionados.join(',')) + 
+        "&municipio=" + encodeURIComponent(mun) + 
+        "&estadoRep=" + encodeURIComponent(est);
+
+    try {
+        await fetch(urlFinal, {
+            method: 'GET', // Cambiamos a GET para máxima compatibilidad
+            mode: 'no-cors'
+        });
+
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        
+        setTimeout(() => {
+            const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*BOLETOS:* ${seleccionados.join(', ')}`;
+            window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+        }, 1500);
+
+    } catch (e) {
+        alert("Error de conexión. Intenta de nuevo.");
+        btn.disabled = false; 
     }
-
+}
     async function verificarBoletos() {
         const ws = document.getElementById('v-ws').value;
         const res = document.getElementById('res-v');
