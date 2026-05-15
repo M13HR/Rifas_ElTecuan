@@ -164,8 +164,12 @@
             grid.appendChild(div);
         }
         try {
-            const r = await fetch(SCRIPT_URL);
-            const data = await r.json();
+            const r = await fetch(SCRIPT_URL + "?action=leer", {
+    method: 'GET',
+    mode: 'cors',
+    redirect: 'follow'
+});
+const data = await r.json();
             
             if(data.apartados) {
                 data.apartados.forEach(n => {
