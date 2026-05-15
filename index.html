@@ -45,7 +45,7 @@
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; height: 400px; overflow-y: auto; background: #fafafa; padding: 12px; border-radius: 12px; border: 1px solid #ddd; }
         .num { padding: 12px 0; background: white; border: 1px solid #eee; border-radius: 6px; cursor: pointer; font-weight: 700; color: var(--azul); text-align: center; font-size: 14px; }
         .num.selected { background: var(--verde) !important; color: white !important; border-color: var(--azul); }
-        .num.apartado { background: #f0f0f0; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
+        .num.apartado { background: #d0d0d0; color: #777; cursor: not-allowed; text-decoration: line-through; }
         .num.pagado { background: #ff4d4d; color: white; cursor: not-allowed; opacity: 0.6; }
 
         /* BOTONES */
@@ -112,7 +112,7 @@
             <p>17 de Septiembre 2026</p>
             
             <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px;">🎰 Método Transparente</h3>
-            <p>El sorteo se realizará mediante <b>Tómbola en Vivo</b> por nuestra cuenta de Instagram. ¡Resultados directos y reales!</p>
+            <p>El sorteo se realizará mediante <b>Tómbola en Vivo</b> por nuestra cuenta de Instagram.</p>
             
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
             <a href="https://instagram.com/rifas_el_tecuan" target="_blank" style="color: var(--naranja); font-weight: bold; text-decoration: none; display: block; text-align: center;">📸 SÍGUENOS: @RIFAS_EL_TECUAN</a>
@@ -124,7 +124,7 @@
     <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none; overflow-y: auto;">
          <div style="padding:30px 20px; text-align: center;">
             <h2>🐯 ¡YA CASI!</h2>
-            <p>Boletos: <b id="nums-confirmar" style="color: var(--naranja);"></b></p>
+            <p>Boletos seleccionados: <b id="nums-confirmar" style="color: var(--naranja);"></b></p>
             <input type="text" id="nombre" class="v-input" placeholder="Nombre completo">
             <input type="number" id="whatsapp" class="v-input" placeholder="WhatsApp (10 dígitos)">
             <select id="estado" class="v-input">
@@ -143,8 +143,7 @@
 </div>
 
 <script>
-    // URL ÚNICA Y ACTUALIZADA
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYKdmXfNnIDjv68c0ScVmZJ6CF8wqmT_v8IDLXQ6HAUy_Z1gwHWlOKLuxuOoPGRtOk1w/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAq5bs9-eJvtLOvFn2vGF0WfRG562dp-UHJLHtV1-ydGnuS58xGGuRPSCBRspMqCF3Jg/exec";
     let seleccionados = [];
 
     function switchTab(tab) {
@@ -168,27 +167,21 @@
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
             
-            const bloquear = (lista, clase) => {
-                if(!lista || !Array.isArray(lista)) return;
-                lista.forEach(nRaw => {
-                    let nFormateado = nRaw.toString().trim().padStart(4, '0');
-                    let el = document.getElementById("n-" + nFormateado);
-                    if(el) {
-                        el.className = 'num ' + clase;
-                        el.onclick = null; 
-                    }
+            if(data.apartados) {
+                data.apartados.forEach(n => {
+                    let el = document.getElementById("n-" + n.trim().padStart(4, '0'));
+                    if(el) { el.className = 'num apartado'; el.onclick = null; }
                 });
-            };
-
-            bloquear(data.apartados, 'apartado');
-            bloquear(data.pagados, 'pagado');
+            }
+            if(data.pagados) {
+                data.pagados.forEach(n => {
+                    let el = document.getElementById("n-" + n.trim().padStart(4, '0'));
+                    if(el) { el.className = 'num pagado'; el.onclick = null; }
+                });
+            }
             
             const total = (data.apartados?.length || 0) + (data.pagados?.length || 0);
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
-            
-            if(data.apartados && data.apartados.length > 0) {
-                document.getElementById('ticker-text').innerText = "🔥 ¡Últimos apartados! " + data.apartados.slice(-5).join(', ') + " ... ¡Suerte! 🐯";
-            }
         } catch (e) { console.error("Error al cargar", e); }
     }
 
@@ -252,11 +245,8 @@
 
         if (!n || !w || !est || !mun) return alert("Llena todos los campos");
 
-        if (btn) {
-            btn.disabled = true;
-            btn.innerText = "Verificando...";
-            btn.style.backgroundColor = "#ccc";
-        }
+        btn.disabled = true;
+        btn.innerText = "Procesando...";
 
         try {
             const response = await fetch(SCRIPT_URL, {
@@ -273,17 +263,18 @@
 
             if (resultado.status === "OK") {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
+                const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*BOLETOS:* ${seleccionados.join(', ')}`;
                 setTimeout(() => {
-                    window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-                }, 1000);
+                    window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+                }, 1500);
             } else {
-                alert("Error: " + (resultado.message || "No disponible"));
+                alert("Error: " + resultado.message);
                 location.reload();
             }
         } catch (e) {
             alert("Error al confirmar. Intenta de nuevo.");
-            if (btn) { btn.disabled = false; btn.innerText = "CONFIRMAR APARTADO"; btn.style.backgroundColor = ""; }
+            btn.disabled = false;
+            btn.innerText = "CONFIRMAR APARTADO";
         }
     }
 
