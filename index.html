@@ -21,7 +21,7 @@
         .logo-img { width: 90px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: white; }
         .hero h1 { font-size: 20px; margin: 10px 0 0; text-transform: uppercase; text-shadow: 1px 1px 0px var(--azul); color: white; }
         
-        /* TICKER ESTILO CUERNAVACA */
+        /* TICKER */
         .ticker { background: #fff9e6; border-bottom: 1px solid #ffeeba; padding: 8px; overflow: hidden; white-space: nowrap; font-size: 12px; color: #856404; }
         .ticker-content { display: inline-block; animation: ticker 20s linear infinite; }
         @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -35,7 +35,7 @@
         .section.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* BARRA DE PROGRESO */
+        /* PROGRESO */
         .progress-container { background: #eee; border-radius: 20px; height: 10px; margin: 10px 0; overflow: hidden; }
         .progress-bar { background: linear-gradient(90deg, var(--verde), #8df388); width: 0%; height: 100%; border-radius: 20px; transition: width 1s; }
 
@@ -48,7 +48,7 @@
         .num.apartado { background: #f0f0f0; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
         .num.pagado { background: #ff4d4d; color: white; cursor: not-allowed; opacity: 0.6; }
 
-        /* BOTONES ACCIÓN */
+        /* BOTONES */
         .btn-luck { background: #fff; border: 2px solid var(--naranja); color: var(--naranja); padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; margin-bottom: 10px; cursor: pointer; }
         .btn-v { background: var(--azul); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
         .btn-flotante { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: bold; width: 85%; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1000; display: none; }
@@ -65,7 +65,6 @@
         <h1>Vento Gladiator 200cc 🐯</h1>
     </div>
 
-    <!-- TICKER DINÁMICO -->
     <div class="ticker">
         <div class="ticker-content" id="ticker-text">
             ¡Mucha suerte a todos los participantes! 🍀 El Tecuan te premia... 🐯
@@ -78,7 +77,6 @@
         <div class="tab" id="tab-info" onclick="switchTab('info')">📢 INFO</div>
     </div>
 
-    <!-- SECCIÓN BOLETOS -->
     <div id="sec-boletos" class="section active">
         <div class="card" style="text-align: center;">
             <img src="Para rifas 17 Pro Max.jpeg" class="moto-img">
@@ -96,7 +94,6 @@
         <div id="grid" class="grid"></div>
     </div>
 
-    <!-- SECCIÓN VERIFICADOR -->
     <div id="sec-verificar" class="section">
         <div class="card" style="text-align: center;">
             <h3 style="color: var(--azul);">Consulta tu boleto</h3>
@@ -106,7 +103,6 @@
         </div>
     </div>
 
-    <!-- SECCIÓN INFO (RECUPERADA) -->
     <div id="sec-info" class="section">
         <div class="card">
             <h3 style="color: var(--azul); border-left: 4px solid var(--naranja); padding-left: 10px; margin-top: 0;">📍 Sede del Sorteo</h3>
@@ -125,7 +121,6 @@
 
     <button class="btn-flotante" id="btn-flotante" onclick="irAlFormulario()">APARTAR BOLETOS 🍀</button>
 
-    <!-- FORMULARIO DE APARTADO -->
     <div id="sec-datos" class="section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:2000; display:none; overflow-y: auto;">
          <div style="padding:30px 20px; text-align: center;">
             <h2>🐯 ¡YA CASI!</h2>
@@ -148,7 +143,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcHGVnAiKOkYT_rEU1hRc5ovhtTghTbDGCgIlEk43qu-cZzRjz2WiMHExXr5mWtGGBog/exec";
+    // URL ÚNICA Y ACTUALIZADA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXggfYMq1FaUcRkvcX6yG9uZClkAHeHaEZ2LFMwI8Ox0LUlsiiT23rwavPRc3V9AI-0Q/exec";
     let seleccionados = [];
 
     function switchTab(tab) {
@@ -172,13 +168,15 @@
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
             
-            // Lógica inteligente para bloquear números (Soluciona caso boleto 178)
             const bloquear = (lista, clase) => {
-                if(!lista) return;
+                if(!lista || !Array.isArray(lista)) return;
                 lista.forEach(nRaw => {
                     let nFormateado = nRaw.toString().trim().padStart(4, '0');
                     let el = document.getElementById("n-" + nFormateado);
-                    if(el) el.className = 'num ' + clase;
+                    if(el) {
+                        el.className = 'num ' + clase;
+                        el.onclick = null; 
+                    }
                 });
             };
 
@@ -189,17 +187,23 @@
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
             
             if(data.apartados && data.apartados.length > 0) {
-                document.getElementById('ticker-text').innerText = "🔥 ¡Últimos números apartados! " + data.apartados.slice(-5).join(', ') + " ... ¡Suerte a todos! 🐯";
+                document.getElementById('ticker-text').innerText = "🔥 ¡Últimos apartados! " + data.apartados.slice(-5).join(', ') + " ... ¡Suerte! 🐯";
             }
-        } catch (e) { console.error("Error al cargar datos", e); }
+        } catch (e) { console.error("Error al cargar", e); }
     }
 
     function togg(n, el) {
         if(el.classList.contains('apartado') || el.classList.contains('pagado')) return;
-        if(seleccionados.includes(n)) { seleccionados = seleccionados.filter(x => x !== n); el.classList.remove('selected'); }
-        else { seleccionados.push(n); el.classList.add('selected'); }
-        document.getElementById('btn-flotante').style.display = seleccionados.length > 0 ? 'block' : 'none';
-        document.getElementById('btn-flotante').innerText = `APARTAR ${seleccionados.length} BOLETOS`;
+        if(seleccionados.includes(n)) { 
+            seleccionados = seleccionados.filter(x => x !== n); 
+            el.classList.remove('selected'); 
+        } else { 
+            seleccionados.push(n); 
+            el.classList.add('selected'); 
+        }
+        const btnF = document.getElementById('btn-flotante');
+        btnF.style.display = seleccionados.length > 0 ? 'block' : 'none';
+        btnF.innerText = `APARTAR ${seleccionados.length} BOLETOS`;
     }
 
     function suerteRapida() {
@@ -239,66 +243,49 @@
         if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
     }
 
-async function enviar() {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXggfYMq1FaUcRkvcX6yG9uZClkAHeHaEZ2LFMwI8Ox0LUlsiiT23rwavPRc3V9AI-0Q/exec";
-  const n = document.getElementById('nombre').value;
-  const w = document.getElementById('whatsapp').value;
-  const est = document.getElementById('estado').value;
-  const mun = document.getElementById('municipio').value;
-  const btn = document.querySelector('.btn-confirmar') || document.querySelector('button[onclick="enviar()"]');
+    async function enviar() {
+        const n = document.getElementById('nombre').value;
+        const w = document.getElementById('whatsapp').value;
+        const est = document.getElementById('estado').value;
+        const mun = document.getElementById('municipio').value;
+        const btn = document.querySelector('button[onclick="enviar()"]');
 
-  if (!n || !w || !est || !mun) return alert("Por favor, llena todos los campos");
+        if (!n || !w || !est || !mun) return alert("Llena todos los campos");
 
-  // Bloqueo de seguridad para evitar múltiples clics
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = "Verificando disponibilidad...";
-    btn.style.backgroundColor = "#ccc";
-  }
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+            btn.style.backgroundColor = "#ccc";
+        }
 
-  try {
-    // Usamos 'text/plain' para evitar problemas de pre-flight CORS con Google Apps Script
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'cors', 
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify({ 
-        nombre: n, 
-        whatsapp: w, 
-        boletos: seleccionados.join(', '), 
-        estadoRep: est, 
-        municipio: mun 
-      })
-    });
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    nombre: n, whatsapp: w, boletos: seleccionados.join(', '), 
+                    estadoRep: est, municipio: mun 
+                })
+            });
 
-    const resultado = await response.json();
+            const resultado = await response.json();
 
-    if (resultado.status === "OK") {
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-      
-      const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
-      
-      setTimeout(() => {
-        window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-      }, 1000);
-    } else {
-      alert("Error: " + (resultado.message || "El número ya no está disponible."));
-      location.reload();
+            if (resultado.status === "OK") {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
+                setTimeout(() => {
+                    window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+                }, 1000);
+            } else {
+                alert("Error: " + (resultado.message || "No disponible"));
+                location.reload();
+            }
+        } catch (e) {
+            alert("Error al confirmar. Intenta de nuevo.");
+            if (btn) { btn.disabled = false; btn.innerText = "CONFIRMAR APARTADO"; btn.style.backgroundColor = ""; }
+        }
     }
-
-  } catch (e) {
-    console.error("Error capturado:", e);
-    // Si hay error de CORS pero el registro se hizo (común en Google), podrías optar por recargar
-    alert("Hubo un problema al confirmar. Por favor, verifica si recibiste confirmación o reintenta.");
-    if (btn) {
-      btn.disabled = false;
-      btn.innerText = "Confirmar Apartado";
-      btn.style.backgroundColor = "";
-    }
-  }
-}
 
     cargar();
 </script>
