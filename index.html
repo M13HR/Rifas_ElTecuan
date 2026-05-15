@@ -263,36 +263,25 @@ async function enviar() {
     const btn = document.querySelector('button[onclick="enviar()"]');
 
     if (!n || !w) return alert("Nombre y WhatsApp son obligatorios");
-
     btn.disabled = true; 
     btn.innerText = "PROCESANDO...";
 
-    // MÉTODO DE EMERGENCIA: Usamos parámetros de URL (Query Params)
-    // Esto evita todos los problemas de seguridad y bloqueos de Google
-    const urlFinal = SCRIPT_URL + 
-        "?nombre=" + encodeURIComponent(n) + 
-        "&whatsapp=" + encodeURIComponent(w) + 
-        "&boletos=" + encodeURIComponent(seleccionados.join(',')) + 
-        "&municipio=" + encodeURIComponent(mun) + 
-        "&estadoRep=" + encodeURIComponent(est);
+    // MÉTODO DIRECTO POR URL (Sin complicaciones)
+    const boletosStr = seleccionados.join(',');
+    const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
 
-    try {
-        await fetch(urlFinal, {
-            method: 'GET', // Cambiamos a GET para máxima compatibilidad
-            mode: 'no-cors'
-        });
+    // Abrimos una imagen invisible con la URL del script. 
+    // Esto fuerza a Google a recibir los datos sí o sí.
+    const img = new Image();
+    img.src = urlFinal;
 
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        
-        setTimeout(() => {
-            const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*BOLETOS:* ${seleccionados.join(', ')}`;
-            window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-        }, 1500);
-
-    } catch (e) {
-        alert("Error de conexión. Intenta de nuevo.");
-        btn.disabled = false; 
-    }
+    // Lanzamos el proceso de éxito directamente
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    
+    setTimeout(() => {
+        const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*BOLETOS:* ${boletosStr}`;
+        window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+    }, 1000);
 }
     async function verificarBoletos() {
         const ws = document.getElementById('v-ws').value;
