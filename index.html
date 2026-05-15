@@ -148,7 +148,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby99sS3s8dfpAw6ZpXQRVRFoSM6-so_ftuYRYSOm0b8MRRXdukLSBF04FK0YrOgyEOcDA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcHGVnAiKOkYT_rEU1hRc5ovhtTghTbDGCgIlEk43qu-cZzRjz2WiMHExXr5mWtGGBog/exec";
     let seleccionados = [];
 
     function switchTab(tab) {
@@ -239,19 +239,62 @@
         if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
     }
 
-    async function enviar() {
-        const n = document.getElementById('nombre').value;
-        const w = document.getElementById('whatsapp').value;
-        const est = document.getElementById('estado').value;
-        const mun = document.getElementById('municipio').value;
-        if(!n || !w || !est || !mun) return alert("Por favor, llena todos los campos");
-        
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre: n, whatsapp: w, boletos: seleccionados.join(', '), estadoRep: est, municipio: mun }) });
-        
-        const msj = `📱 *RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
-        setTimeout(() => { window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`; }, 1000);
+async function enviar() {
+  const n = document.getElementById('nombre').value;
+  const w = document.getElementById('whatsapp').value;
+  const est = document.getElementById('estado').value;
+  const mun = document.getElementById('municipio').value;
+  const btn = document.querySelector('.btn-confirmar'); // Busca el botón de confirmación
+
+  if (!n || !w || !est || !mun) return alert("Por favor, llena todos los campos");
+
+  // BLOQUEO DE BOTÓN: Evita que el usuario presione varias veces
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Verificando disponibilidad...";
+    btn.style.backgroundColor = "#ccc"; // Cambia a gris para que se note el bloqueo
+  }
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({ 
+        nombre: n, 
+        whatsapp: w, 
+        boletos: seleccionados.join(', '), 
+        estadoRep: est, 
+        municipio: mun 
+      })
+    });
+
+    const resultado = await response.json();
+
+    if (resultado.status === "OK") {
+      // ÉXITO: Lanzamos confeti y enviamos a WhatsApp
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      
+      const msj = `*RIFAS EL TECUAN* 🐯\n*NOMBRE:* ${n}\n*LUGAR:* ${mun}, ${est}\n*BOLETOS:* ${seleccionados.join(', ')}`;
+      
+      setTimeout(() => {
+        window.top.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
+      }, 1000);
+    } else {
+      // ERROR: El boleto ya se ganó o hay saturación
+      alert("¡Lo sentimos! Uno o más números seleccionados ya fueron apartados mientras llenabas el formulario. La página se actualizará para mostrar los disponibles.");
+      location.reload();
     }
+
+  } catch (e) {
+    console.error(e);
+    alert("Hubo un problema al conectar con el servidor. Revisa tu internet o intenta de nuevo.");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Confirmar Apartado";
+      btn.style.backgroundColor = ""; // Regresa al color original
+    }
+  }
+}
 
     cargar();
 </script>
