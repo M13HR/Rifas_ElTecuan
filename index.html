@@ -314,14 +314,19 @@
 
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
             
-            setTimeout(() => {
-                // MENSAJE DE WHATSAPP ALEGRE Y PROFESIONAL
-                const msj = `¡HOLA RIFAS EL TECUAN! 🐯🍀\n\n` +
+         setTimeout(() => {
+                // 1. Calculamos el total dinámicamente ($50 por boleto)
+                const cantidadBoletos = seleccionados.length;
+                const totalAPagar = cantidadBoletos * 50;
+
+                // 2. MENSAJE DE WHATSAPP CON EL TOTAL INCLUIDO
+                const msj = ` ¡HOLA RIFAS EL TECUAN! 🐯🍀\n\n` +
                           `✨ *¡QUIERO APARTAR MIS BOLETOS!* ✨\n\n` +
                           `👤 *Nombre:* ${n}\n` +
                           `📱 *WhatsApp:* ${w}\n` +
                           `📍 *De:* ${mun}, ${est}\n` +
-                          `🎟️ *Mis Números:* [ ${boletosStr} ]\n\n` +
+                          `🎟️ *Mis Números:* [ ${boletosStr} ]\n` +
+                          `💰 *Total a Pagar:* $${totalAPagar} MXN\n\n` +
                           `----------------------------------\n` +
                           `⏳ *AVISO IMPORTANTE:* \n` +
                           `Cuento con *6 HORAS* para realizar mi pago y enviar el comprobante por aquí, de lo contrario mis números serán liberados. 🕒\n` +
