@@ -234,7 +234,8 @@
                 });
             }
             
-            const total = (data.apartados?.length || 0) + (data.pagados?.length || 0);
+            // La barra de progreso ahora cuenta exclusivamente los boletos reales PAGADOS
+const totalVendidos = data.pagados.length;
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
             document.getElementById('contador-meta').innerText = `🔥 ¡Llevamos ${total} de 2500 boletos vendidos!`;
             
