@@ -208,25 +208,29 @@
     async function cargar() {
         datosCargados = false;
         const grid = document.getElementById('grid');
-        grid.innerHTML = '<p style="grid-column: 1/6; text-align:center; padding:20px;">Sincronizando tómbola... 🐯</p>';
-        
+     // 1. Dibujamos al instante los 2500 números en pantalla
         let html = '';
         for(let i=1; i <= 2500; i++) {
             let n = i.toString().padStart(4, '0');
             html += `<div class="num" id="n-${n}" onclick="togg('${n}', this)">${n}</div>`;
         }
         grid.innerHTML = html;
+        
+        // Mantenemos bloqueado el clic temporalmente mientras llegan los datos reales
+        datosCargados = false; 
 
         try {
-            // Reemplazo del truco de la imagen por una petición fetch segura
-            await fetch(urlFinal, { method: 'GET', mode: 'no-cors' });
+            const r = await fetch(SCRIPT_URL + "?t=" + new Date().getTime());
+            const data = await r.json();
             
+            // 2. Marcamos los apartados reales
             if(data.apartados) {
                 data.apartados.forEach(n => {
                     let el = document.getElementById("n-" + String(n).trim().padStart(4, '0'));
                     if(el) { el.className = 'num apartado'; el.onclick = null; }
                 });
             }
+            // 3. Marcamos los pagados reales
             if(data.pagados) {
                 data.pagados.forEach(n => {
                     let el = document.getElementById("n-" + String(n).trim().padStart(4, '0'));
@@ -234,14 +238,18 @@
                 });
             }
             
-const totalVendidos = data.pagados.length;
+            // Actualizamos la barra de progreso (solo con pagados)
+            const total = (data.pagados?.length || 0);
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
             document.getElementById('contador-meta').innerText = `🔥 ¡Llevamos ${total} de 2500 boletos vendidos!`;
             
-            datosCargados = true;
+            // 4. ¡AHORA SÍ! Una vez todo marcado, liberamos el clic de forma segura
+            datosCargados = true; 
+            
         } catch (e) { 
-            console.error("Error:", e);
-            grid.innerHTML = '<p style="grid-column: 1/6; color:red; text-align:center;">⚠️ Error de conexión. Recarga la página.</p>';
+            console.error("Error al sincronizar boletos ocupados:", e);
+            // Si falla la conexión de Google, liberamos los números como preventivo para no trabar la web
+            datosCargados = true; 
         }
     }
 
