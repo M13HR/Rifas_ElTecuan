@@ -218,8 +218,8 @@
         grid.innerHTML = html;
 
         try {
-            const r = await fetch(SCRIPT_URL + "?t=" + new Date().getTime());
-            const data = await r.json();
+            // Reemplazo del truco de la imagen por una petición fetch segura
+            await fetch(urlFinal, { method: 'GET', mode: 'no-cors' });
             
             if(data.apartados) {
                 data.apartados.forEach(n => {
