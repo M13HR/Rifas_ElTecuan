@@ -314,21 +314,21 @@
         btn.innerText = "🚀 PROCESANDO REGISTRO...";
 
         const boletosStr = seleccionados.join(',');
-        const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
+       const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
 
         try {
-            const img = new Image();
-            img.src = urlFinal;
-
+            // 1. Lanzamos el confeti
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-            
-         setTimeout(() => {
-                // 1. Calculamos el total dinámicamente ($50 por boleto)
+
+            // 2. Hacemos la petición real y segura a Google Sheets
+            fetch(urlFinal, { method: 'GET', mode: 'no-cors' });
+
+            // 3. Esperamos 1.5 segundos antes de redirigir para que a Google le dé tiempo de poner la fecha
+            setTimeout(() => {
                 const cantidadBoletos = seleccionados.length;
                 const totalAPagar = cantidadBoletos * 50;
 
-                // 2. MENSAJE DE WHATSAPP CON EL TOTAL INCLUIDO
-                const msj = ` ¡HOLA RIFAS EL TECUAN! 🐯🍀\n\n` +
+                const msj = `¡HOLA RIFAS EL TECUAN! 🐯🍀\n\n` +
                           `✨ *¡QUIERO APARTAR MIS BOLETOS!* ✨\n\n` +
                           `👤 *Nombre:* ${n}\n` +
                           `📱 *WhatsApp:* ${w}\n` +
@@ -340,11 +340,13 @@
                           `Cuento con *6 HORAS* para realizar mi pago y enviar el comprobante por aquí, de lo contrario mis números serán liberados. 🕒\n` +
                           `----------------------------------\n\n` +
                           `¡Quedo a la espera de la información de pago! 🚀💨`;
-                
+
                 window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-            }, 1500);
+            }, 1500); // 1500 milisegundos de espera controlada
 
         } catch (e) {
+            console.error("Error al enviar los datos:", e);
+        }
             alert("Hubo un detalle de conexión. Por favor reintenta.");
             btn.disabled = false;
             btn.innerText = "CONFIRMAR APARTADO";
