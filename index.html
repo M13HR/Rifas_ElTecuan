@@ -160,12 +160,52 @@
             <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
                     <label style="font-size:12px; font-weight:bold; color:var(--azul);">ESTADO:</label>
-                    <input type="text" id="estado" class="v-input" placeholder="Puebla">
+                    <select id="estado" class="v-input" onchange="validarEstadoOtro()" style="height: 52px; background: white; -webkit-appearance: none;">
+                        <option value="" disabled selected>Selecciona...</option>
+                        <option value="Aguascalientes">Aguascalientes</option>
+                        <option value="Baja California">Baja California</option>
+                        <option value="Baja California Sur">Baja California Sur</option>
+                        <option value="Campeche">Campeche</option>
+                        <option value="Chiapas">Chiapas</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                        <option value="Ciudad de México">CDMX</option>
+                        <option value="Coahuila">Coahuila</option>
+                        <option value="Colima">Colima</option>
+                        <option value="Durango">Durango</option>
+                        <option value="Estado de México">EdoMex</option>
+                        <option value="Guanajuato">Guanajuato</option>
+                        <option value="Guerrero">Guerrero</option>
+                        <option value="Hidalgo">Hidalgo</option>
+                        <option value="Jalisco">Jalisco</option>
+                        <option value="Michoacán">Michoacán</option>
+                        <option value="Morelos">Morelos</option>
+                        <option value="Nayarit">Nayarit</option>
+                        <option value="Nuevo León">Nuevo León</option>
+                        <option value="Oaxaca">Oaxaca</option>
+                        <option value="Puebla">Puebla</option>
+                        <option value="Querétaro">Querétaro</option>
+                        <option value="Quintana Roo">Quintana Roo</option>
+                        <option value="San Luis Potosí">San Luis Potosí</option>
+                        <option value="Sinaloa">Sinaloa</option>
+                        <option value="Sonora">Sonora</option>
+                        <option value="Tabasco">Tabasco</option>
+                        <option value="Tamaulipas">Tamaulipas</option>
+                        <option value="Tlaxcala">Tlaxcala</option>
+                        <option value="Veracruz">Veracruz</option>
+                        <option value="Yucatán">Yucatán</option>
+                        <option value="Zacatecas">Zacatecas</option>
+                        <option value="Otro">Extranjero / Otro</option>
+                    </select>
                 </div>
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:bold; color:var(--azul);">MUNICIPIO:</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--azul);">MUNICIPIO / CIUDAD:</label>
                     <input type="text" id="municipio" class="v-input" placeholder="Acatlán">
                 </div>
+            </div>
+
+            <div id="contenedor-estado-otro" style="display:none; animation: fadeIn 0.3s ease;">
+                <label style="font-size:12px; font-weight:bold; color:var(--naranja);">ESPECIFICA TU ESTADO O PAÍS:</label>
+                <input type="text" id="estado_otro" class="v-input" placeholder="Ej. Texas, USA o California">
             </div>
 
             <button class="btn-v" style="background: var(--verde); font-size:18px;" onclick="enviar()">🔥 CONFIRMAR MI APARTADO</button>
@@ -175,7 +215,6 @@
 </div>
 
 <script>
-    // URL DE TU SCRIPT DE GOOGLE (Asegúrate de que sea la última implementación)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAiZ_u3LNBVYWKeB4bhp71bJqdOKildNN98GF5Q6SVW-h6_pBVf-iyViNE12P9vMF7/exec";
     
     let seleccionados = [];
@@ -205,34 +244,40 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
+    // Muestra u oculta el campo de texto libre dependiendo de la opción seleccionada
+    function validarEstadoOtro() {
+        const estadoSelect = document.getElementById('estado').value;
+        const contenedorOtro = document.getElementById('contenedor-estado-otro');
+        if(estadoSelect === "Otro") {
+            contenedorOtro.style.display = 'block';
+            document.getElementById('estado_otro').focus();
+        } else {
+            contenedorOtro.style.display = 'none';
+        }
+    }
+
     // CARGAR BOLETOS DESDE EXCEL
     async function cargar() {
         datosCargados = false;
         const grid = document.getElementById('grid');
         
-        // 1. Dibujamos al instante los 2500 números en pantalla
         let html = '';
         for(let i=1; i <= 2500; i++) {
             let n = i.toString().padStart(4, '0');
             html += `<div class="num" id="n-${n}" onclick="togg('${n}', this)">${n}</div>`;
         }
         grid.innerHTML = html;
-        
-        // Mantenemos bloqueado el clic temporalmente mientras llegan los datos reales
-        datosCargados = false; 
 
         try {
             const r = await fetch(SCRIPT_URL + "?t=" + new Date().getTime());
             const data = await r.json();
             
-            // 2. Marcamos los apartados reales
             if(data.apartados) {
                 data.apartados.forEach(n => {
                     let el = document.getElementById("n-" + String(n).trim().padStart(4, '0'));
                     if(el) { el.className = 'num apartado'; el.onclick = null; }
                 });
             }
-            // 3. Marcamos los pagados reales
             if(data.pagados) {
                 data.pagados.forEach(n => {
                     let el = document.getElementById("n-" + String(n).trim().padStart(4, '0'));
@@ -240,17 +285,14 @@
                 });
             }
             
-            // Actualizamos la barra de progreso (solo con pagados)
             const total = (data.pagados?.length || 0);
             document.querySelector('.progress-bar').style.width = (total / 2500 * 100) + '%';
             document.getElementById('contador-meta').innerText = `🔥 ¡Llevamos ${total} de 2500 boletos vendidos!`;
             
-            // 4. ¡AHORA SÍ! Una vez todo marcado, liberamos el clic de forma segura
             datosCargados = true; 
             
         } catch (e) { 
             console.error("Error al sincronizar boletos ocupados:", e);
-            // Si falla la conexión de Google, liberamos los números como preventivo para no trabar la web
             datosCargados = true; 
         }
     }
@@ -299,19 +341,26 @@
         document.getElementById('sec-datos').style.display = 'block';
     }
 
-    // Corrección aquí: eliminamos la duplicación que cortaba la lógica y reestructuramos el try-catch de enviar()
     function cerrarForm() { document.getElementById('sec-datos').style.display = 'none'; }
 
-    // FUNCIÓN ENVIAR (CON MENSAJE DE WHATSAPP MEJORADO Y TIEMPO PARA LA FECHA)
+    // FUNCIÓN ENVIAR OPTIMIZADA
     async function enviar() {
         const n = document.getElementById('nombre').value.trim();
         const w = document.getElementById('whatsapp').value.trim();
-        const est = document.getElementById('estado').value.trim();
         const mun = document.getElementById('municipio').value.trim();
+        const estadoSelect = document.getElementById('estado').value;
         const btn = document.querySelector('button[onclick="enviar()"]');
 
-        if (!n || !w || !est || !mun) return alert("⚠️ Por favor completa todos los campos.");
+        if (!n || !w || !estadoSelect || !mun) return alert("⚠️ Por favor completa todos los campos.");
         if (w.length < 10) return alert("⚠️ El WhatsApp debe tener 10 dígitos.");
+
+        // Definir qué texto de estado mandaremos a Google Sheets
+        let est = estadoSelect;
+        if(estadoSelect === "Otro") {
+            const otroTexto = document.getElementById('estado_otro').value.trim();
+            if(!otroTexto) return alert("⚠️ Por favor escribe el nombre de tu estado o país extranjero.");
+            est = otroTexto;
+        }
 
         btn.disabled = true; 
         btn.innerText = "🚀 PROCESANDO REGISTRO...";
@@ -320,13 +369,10 @@
         const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
 
         try {
-            // 1. Lanzamos el confeti
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
 
-            // 2. Hacemos la petición real y segura a Google Sheets
             fetch(urlFinal, { method: 'GET', mode: 'no-cors' });
 
-            // 3. Esperamos 1.5 segundos antes de redirigir para que a Google le dé tiempo de poner la fecha
             setTimeout(() => {
                 const cantidadBoletos = seleccionados.length;
                 const totalAPagar = cantidadBoletos * 50;
@@ -345,7 +391,7 @@
                           `¡Quedo a la espera de la información de pago! 🚀💨`;
 
                 window.location.href = `https://api.whatsapp.com/send?phone=529531024519&text=${encodeURIComponent(msj)}`;
-            }, 1500); // 1500 milisegundos de espera controlada
+            }, 1500);
 
         } catch (e) {
             console.error("Error al enviar los datos:", e);
@@ -355,7 +401,7 @@
         }
     }
 
-    // CONSULTA DE BOLETOS VISUALMENTE INTERESANTE
+    // CONSULTA DE BOLETOS
     async function verificarBoletos() {
         const ws = document.getElementById('v-ws').value;
         const res = document.getElementById('res-v');
@@ -376,7 +422,6 @@
                     let colorEstado = esPagado ? "#2e7d32" : "#f57c00";
                     let textoEstado = esPagado ? "✅ CONFIRMADO" : "⏳ APARTADO";
                     
-                    // LÓGICA DEL CONTADOR DE 6 HORAS
                     let infoTiempo = "";
                     if(!esPagado && b.fecha) {
                         let fechaRegistro = new Date(b.fecha);
@@ -412,7 +457,6 @@
         }
     }
     
-    // Inicialización del script
     cargar();
 </script>
 </body>
