@@ -33,7 +33,7 @@
 
         /* GRID DE BOLETOS */
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; height: 450px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 15px; border: 1px solid #e0e0e0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-        .num { padding: 14px 0; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 800; color: var(--azul); text-align: center; font-size: 15px; transition: 0.2s; shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .num { padding: 14px 0; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 800; color: var(--azul); text-align: center; font-size: 15px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .num:active { transform: scale(0.9); }
         .num.selected { background: var(--verde) !important; color: white !important; border-color: #3d9439; box-shadow: 0 4px 8px rgba(77,183,72,0.3); }
         .num.apartado { background: #e0e0e0; color: #999; cursor: not-allowed; text-decoration: line-through; border-color: #ccc; }
@@ -173,6 +173,7 @@
          </div>
     </div>
 </div>
+
 <script>
     // URL DE TU SCRIPT DE GOOGLE (Asegúrate de que sea la última implementación)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAiZ_u3LNBVYWKeB4bhp71bJqdOKildNN98GF5Q6SVW-h6_pBVf-iyViNE12P9vMF7/exec";
@@ -208,7 +209,8 @@
     async function cargar() {
         datosCargados = false;
         const grid = document.getElementById('grid');
-     // 1. Dibujamos al instante los 2500 números en pantalla
+        
+        // 1. Dibujamos al instante los 2500 números en pantalla
         let html = '';
         for(let i=1; i <= 2500; i++) {
             let n = i.toString().padStart(4, '0');
@@ -297,9 +299,10 @@
         document.getElementById('sec-datos').style.display = 'block';
     }
 
+    // Corrección aquí: eliminamos la duplicación que cortaba la lógica y reestructuramos el try-catch de enviar()
     function cerrarForm() { document.getElementById('sec-datos').style.display = 'none'; }
 
-    // FUNCIÓN ENVIAR (CON MENSAJE DE WHATSAPP MEJORADO)
+    // FUNCIÓN ENVIAR (CON MENSAJE DE WHATSAPP MEJORADO Y TIEMPO PARA LA FECHA)
     async function enviar() {
         const n = document.getElementById('nombre').value.trim();
         const w = document.getElementById('whatsapp').value.trim();
@@ -314,7 +317,7 @@
         btn.innerText = "🚀 PROCESANDO REGISTRO...";
 
         const boletosStr = seleccionados.join(',');
-       const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
+        const urlFinal = `${SCRIPT_URL}?nombre=${encodeURIComponent(n)}&whatsapp=${encodeURIComponent(w)}&boletos=${encodeURIComponent(boletosStr)}&municipio=${encodeURIComponent(mun)}&estadoRep=${encodeURIComponent(est)}`;
 
         try {
             // 1. Lanzamos el confeti
@@ -346,7 +349,6 @@
 
         } catch (e) {
             console.error("Error al enviar los datos:", e);
-        }
             alert("Hubo un detalle de conexión. Por favor reintenta.");
             btn.disabled = false;
             btn.innerText = "CONFIRMAR APARTADO";
@@ -355,60 +357,62 @@
 
     // CONSULTA DE BOLETOS VISUALMENTE INTERESANTE
     async function verificarBoletos() {
-    const ws = document.getElementById('v-ws').value;
-    const res = document.getElementById('res-v');
-    if(!ws || ws.length < 10) return alert("Por favor, ingresa tu WhatsApp a 10 dígitos");
-    
-    res.style.display = "block";
-    res.innerHTML = "🔍 Buscando tus números en la tómbola...";
-    
-    try {
-        const r = await fetch(`${SCRIPT_URL}?verificar=${ws}`);
-        const data = await r.json();
+        const ws = document.getElementById('v-ws').value;
+        const res = document.getElementById('res-v');
+        if(!ws || ws.length < 10) return alert("Por favor, ingresa tu WhatsApp a 10 dígitos");
         
-        if(data.encontrados && data.encontrados.length > 0) {
-            let html = `<div style="font-weight:bold; color:var(--azul); margin-bottom:12px; font-size:16px;">¡Hola, ${data.nombre}! 🐯</div>`;
+        res.style.display = "block";
+        res.innerHTML = "🔍 Buscando tus números en la tómbola...";
+        
+        try {
+            const r = await fetch(`${SCRIPT_URL}?verificar=${ws}`);
+            const data = await r.json();
             
-            data.encontrados.forEach(b => {
-                let esPagado = b.estado === "PAGADO";
-                let colorEstado = esPagado ? "#2e7d32" : "#f57c00";
-                let textoEstado = esPagado ? "✅ CONFIRMADO" : "⏳ APARTADO";
+            if(data.encontrados && data.encontrados.length > 0) {
+                let html = `<div style="font-weight:bold; color:var(--azul); margin-bottom:12px; font-size:16px;">¡Hola, ${data.nombre}! 🐯</div>`;
                 
-                // LÓGICA DEL CONTADOR DE 6 HORAS
-                let infoTiempo = "";
-                if(!esPagado && b.fecha) {
-                    let fechaRegistro = new Date(b.fecha);
-                    let limite = new Date(fechaRegistro.getTime() + (6 * 60 * 60 * 1000));
-                    let ahora = new Date();
-                    let dif = limite - ahora;
+                data.encontrados.forEach(b => {
+                    let esPagado = b.estado === "PAGADO";
+                    let colorEstado = esPagado ? "#2e7d32" : "#f57c00";
+                    let textoEstado = esPagado ? "✅ CONFIRMADO" : "⏳ APARTADO";
                     
-                    if(dif > 0) {
-                        let h = Math.floor(dif / (1000 * 60 * 60));
-                        let m = Math.floor((dif % (1000 * 60 * 60)) / (1000 * 60));
-                        infoTiempo = `<div style="color:#d32f2f; font-size:12px; margin-top:5px;">⏰ Tienes ${h}h ${m}m para pagar</div>`;
-                    } else {
-                        infoTiempo = `<div style="color:#d32f2f; font-size:12px; margin-top:5px;">⚠️ Tiempo límite excedido</div>`;
+                    // LÓGICA DEL CONTADOR DE 6 HORAS
+                    let infoTiempo = "";
+                    if(!esPagado && b.fecha) {
+                        let fechaRegistro = new Date(b.fecha);
+                        let limite = new Date(fechaRegistro.getTime() + (6 * 60 * 60 * 1000));
+                        let ahora = new Date();
+                        let dif = limite - ahora;
+                        
+                        if(dif > 0) {
+                            let h = Math.floor(dif / (1000 * 60 * 60));
+                            let m = Math.floor((dif % (1000 * 60 * 60)) / (1000 * 60));
+                            infoTiempo = `<div style="color:#d32f2f; font-size:12px; margin-top:5px;">⏰ Tienes ${h}h ${m}m para pagar</div>`;
+                        } else {
+                            infoTiempo = `<div style="color:#d32f2f; font-size:12px; margin-top:5px;">⚠️ Tiempo límite excedido</div>`;
+                        }
                     }
-                }
 
-                html += `
-                    <div style="border:1px solid #eee; padding:12px; margin-bottom:8px; border-radius:10px; background:#fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="background:var(--azul); color:white; padding:4px 8px; border-radius:5px; font-weight:bold; font-family:monospace; font-size:16px;">${b.num}</span>
-                            <span style="color:${colorEstado}; font-weight:bold; font-size:13px;">${textoEstado}</span>
+                    html += `
+                        <div style="border:1px solid #eee; padding:12px; margin-bottom:8px; border-radius:10px; background:#fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="background:var(--azul); color:white; padding:4px 8px; border-radius:5px; font-weight:bold; font-family:monospace; font-size:16px;">${b.num}</span>
+                                <span style="color:${colorEstado}; font-weight:bold; font-size:13px;">${textoEstado}</span>
+                            </div>
+                            ${infoTiempo}
                         </div>
-                        ${infoTiempo}
-                    </div>
-                `;
-            });
-            res.innerHTML = html;
-        } else {
-            res.innerHTML = "<div style='padding:20px;'>❌ No se encontraron boletos. Asegúrate de ingresar el WhatsApp con el que te registraste.</div>";
+                    `;
+                });
+                res.innerHTML = html;
+            } else {
+                res.innerHTML = "<div style='padding:20px;'>❌ No se encontraron boletos. Asegúrate de ingresar el WhatsApp con el que te registraste.</div>";
+            }
+        } catch (e) {
+            res.innerHTML = "<div style='padding:20px;'>⚠️ Error de conexión. Intenta de nuevo en unos segundos.</div>";
         }
-    } catch (e) {
-        res.innerHTML = "<div style='padding:20px;'>⚠️ Error de conexión. Intenta de nuevo en unos segundos.</div>";
     }
-}
+    
+    // Inicialización del script
     cargar();
 </script>
 </body>
