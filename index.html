@@ -240,7 +240,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAiZ_u3LNBVYWKeB4bhp71bJqdOKildNN98GF5Q6SVW-h6_pBVf-iyViNE12P9vMF7/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOxEEbWVnDxSMQPApBn-cVZZT3SFcEVqt0GqMT4tbVphFidnUuTlp478CXUpv1BmA8/exec";
     
     let seleccionados = [];
     let datosCargados = false;
@@ -268,18 +268,7 @@
     }
     setInterval(updateCountdown, 1000);
     updateCountdown();
-
-    // LÓGICA DE ROTACIÓN AUTOMÁTICA DEL SLIDER (3 SEGUNDOS)
-    let indiceSlide = 0;
-    function rotarImagenes() {
-        const slides = document.querySelectorAll('.slide');
-        if (slides.length <= 1) return;
-        slides[indiceSlide].classList.remove('active');
-        indiceSlide = (indiceSlide + 1) % slides.length;
-        slides[indiceSlide].classList.add('active');
-    }
-    setInterval(rotarImagenes, 3000);
-
+    
     function validarEstadoOtro() {
         const estadoSelect = document.getElementById('estado').value;
         const contenedorOtro = document.getElementById('contenedor-estado-otro');
